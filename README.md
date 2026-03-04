@@ -1,4 +1,6 @@
-# Nu primesc notă pentru că nu am pus titlu și descriere
+# Văcuța Mea
+
+„Văcuța Mea” este un joc interactiv de tip virtual pet, dezvoltat în consolă (sau cu o interfață grafică minimală), în care jucătorul își asumă responsabilitatea îngrijirii unei singure văcuțe. Scopul jocului este menținerea văcuței în viață și fericită, gestionându-i resursele vitale: foamea, energia, igiena și afecțiunea. Pe măsură ce timpul trece (simulat prin acțiuni sau tick-uri), văcuța consumă resurse și produce lapte, care poate fi „vândut” pentru a cumpăra hrană mai bună sau accesorii.
 
 ### Folosiți template-ul corespunzător grupei voastre!
 
