@@ -10,7 +10,6 @@ private:
     int valoare;
 public:
     explicit Status(std::string n, int v) : nume{std::move(n)}, valoare{v} {}
-
     void modifica(int delta) {
         valoare = std::clamp(valoare + delta, 0, 100);
     }
@@ -27,13 +26,17 @@ private:
 
 public:
     explicit Vacuta(const char* nume_dat)
-        : nume{new char[std::strlen(nume_dat) + 1]},
+        : nume{nullptr},
           foame{"Foame", 100},
           energie{"Energie", 100},
           litriLapte{0},
           bani{10}
     {
-        std::strcpy(nume, nume_dat);
+        if (nume_dat) {
+            size_t len = std::strlen(nume_dat) + 1;
+            nume = new char[len];
+            std::copy(nume_dat, nume_dat + len, nume);
+        }
     }
 
     ~Vacuta() {
@@ -41,22 +44,29 @@ public:
     }
 
     Vacuta(const Vacuta& other)
-        : nume{new char[std::strlen(other.nume) + 1]},
+        : nume{nullptr},
           foame{other.foame},
           energie{other.energie},
           litriLapte{other.litriLapte},
           bani{other.bani}
     {
-        std::strcpy(nume, other.nume);
+        if (other.nume) {
+            size_t len = std::strlen(other.nume) + 1;
+            nume = new char[len];
+            std::copy(other.nume, other.nume + len, nume);
+        }
     }
 
     Vacuta& operator=(const Vacuta& other) {
         if (this != &other) {
-            char* nume_nou = new char[std::strlen(other.nume) + 1];
-            std::strcpy(nume_nou, other.nume);
+            char* nume_nou = nullptr;
+            if (other.nume) {
+                size_t len = std::strlen(other.nume) + 1;
+                nume_nou = new char[len];
+                std::copy(other.nume, other.nume + len, nume_nou);
+            }
             delete[] nume;
             nume = nume_nou;
-
             foame = other.foame;
             energie = other.energie;
             litriLapte = other.litriLapte;
@@ -66,7 +76,7 @@ public:
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Vacuta& v) {
-        os << "\n--- Status " << v.nume << " ---\n"
+        os << "\n--- Status " << (v.nume ? v.nume : "Anonim") << " ---\n"
            << "Foame: " << v.foame.getValoare() << "/100\n"
            << "Energie: " << v.energie.getValoare() << "/100\n"
            << "Lapte: " << v.litriLapte << "L | Bani: " << v.bani << "\n";
@@ -102,12 +112,9 @@ int main() {
     v1.treceTimpul(2);
     v1.mulge();
     v1.vindeLapte();
-
     std::cout << v1;
-
     Vacuta v2{v1};
     Vacuta v3{"Zuzu"};
     v3 = v1;
-
     return 0;
 }
