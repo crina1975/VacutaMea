@@ -1,55 +1,119 @@
 #include <iostream>
-#include <array>
-#include "include/Example.h"
-// This also works if you do not want `include/`, but some editors might not like it
-// #include "Example.h"
+#include <string>
+#include <cstring>
+#include <algorithm>
+#include <utility>
+
+class Status {
+private:
+    std::string nume;
+    int valoare;
+public:
+    explicit Status(std::string n, int v) : nume{std::move(n)}, valoare{v} {}
+
+    void modifica(int delta) {
+        valoare = std::clamp(valoare + delta, 0, 100);
+    }
+    int getValoare() const { return valoare; }
+};
+
+class Vacuta {
+private:
+    char* nume;
+    Status foame;
+    Status energie;
+    int litriLapte;
+    int bani;
+
+public:
+    explicit Vacuta(const char* nume_dat)
+        : foame{"Foame", 100},
+          energie{"Energie", 100},
+          litriLapte{0},
+          bani{10} {
+        nume = new char[std::strlen(nume_dat) + 1];
+        std::strcpy(nume, nume_dat);
+        std::cout << "[LOG] S-a nascut vacuta " << nume << "\n";
+    }
+
+    ~Vacuta() {
+        delete[] nume;
+        std::cout << "[LOG] Resurse eliberate (Destructor).\n";
+    }
+
+    Vacuta(const Vacuta& other)
+        : foame{other.foame},
+          energie{other.energie},
+          litriLapte{other.litriLapte},
+          bani{other.bani} {
+        nume = new char[std::strlen(other.nume) + 1];
+        std::strcpy(nume, other.nume);
+        std::cout << "[LOG] Constructor de copiere apelat.\n";
+    }
+
+    Vacuta& operator=(const Vacuta& other) {
+        if (this != &other) {
+            delete[] nume;
+            nume = new char[std::strlen(other.nume) + 1];
+            std::strcpy(nume, other.nume);
+            foame = other.foame;
+            energie = other.energie;
+            litriLapte = other.litriLapte;
+            bani = other.bani;
+        }
+        std::cout << "[LOG] Operator= apelat.\n";
+        return *this;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Vacuta& v) {
+        os << "\n--- Status " << v.nume << " ---\n"
+           << "Foame: " << v.foame.getValoare() << "/100\n"
+           << "Energie: " << v.energie.getValoare() << "/100\n"
+           << "Lapte: " << v.litriLapte << "L | Bani: " << v.bani << "\n";
+        return os;
+    }
+
+
+    void treceTimpul(int ore) {
+        foame.modifica(-10 * ore);
+        energie.modifica(-5 * ore);
+        if (foame.getValoare() < 20) {
+            energie.modifica(-15 * ore);
+        }
+    }
+
+    void mulge() {
+        if (energie.getValoare() > 30 && foame.getValoare() > 20) {
+            int bonus = foame.getValoare() / 25;
+            litriLapte += (5 + bonus);
+            energie.modifica(-35);
+            std::cout << "[JOC] Ai muls " << 5 + bonus << " litri.\n";
+        } else {
+            std::cout << "[JOC] Vacuta e prea obosita!\n";
+        }
+    }
+
+    void vindeLapte() {
+        if (litriLapte > 0) {
+            bani += litriLapte * 3;
+            std::cout << "[JOC] Ai vandut laptele pentru " << litriLapte * 3 << " bani.\n";
+            litriLapte = 0;
+        }
+    }
+};
 
 int main() {
-    std::cout << "Hello, world!\n";
-    Example e1;
-    e1.g();
-    std::array<int, 100> v{};
-    int nr;
-    std::cout << "Introduceți nr: ";
-    /////////////////////////////////////////////////////////////////////////
-    /// Observație: dacă aveți nevoie să citiți date de intrare de la tastatură,
-    /// dați exemple de date de intrare folosind fișierul tastatura.txt
-    /// Trebuie să aveți în fișierul tastatura.txt suficiente date de intrare
-    /// (în formatul impus de voi) astfel încât execuția programului să se încheie.
-    /// De asemenea, trebuie să adăugați în acest fișier date de intrare
-    /// pentru cât mai multe ramuri de execuție.
-    /// Dorim să facem acest lucru pentru a automatiza testarea codului, fără să
-    /// mai pierdem timp de fiecare dată să introducem de la zero aceleași date de intrare.
-    ///
-    /// Pe GitHub Actions (bife), fișierul tastatura.txt este folosit
-    /// pentru a simula date introduse de la tastatură.
-    /// Bifele verifică dacă programul are erori de compilare, erori de memorie și memory leaks.
-    ///
-    /// Dacă nu puneți în tastatura.txt suficiente date de intrare, îmi rezerv dreptul să vă
-    /// testez codul cu ce date de intrare am chef și să nu pun notă dacă găsesc vreun bug.
-    /// Impun această cerință ca să învățați să faceți un demo și să arătați părțile din
-    /// program care merg (și să le evitați pe cele care nu merg).
-    ///
-    /////////////////////////////////////////////////////////////////////////
-    std::cin >> nr;
-    /////////////////////////////////////////////////////////////////////////
-    for(int i = 0; i < nr; ++i) {
-        std::cout << "v[" << i << "] = ";
-        std::cin >> v[i];
-    }
-    std::cout << "\n\n";
-    std::cout << "Am citit de la tastatură " << nr << " elemente:\n";
-    for(int i = 0; i < nr; ++i) {
-        std::cout << "- " << v[i] << "\n";
-    }
-    ///////////////////////////////////////////////////////////////////////////
-    /// Pentru date citite din fișier, NU folosiți tastatura.txt. Creați-vă voi
-    /// alt fișier propriu cu ce alt nume doriți.
-    /// Exemplu:
-    /// std::ifstream fis("date.txt");
-    /// for(int i = 0; i < nr2; ++i)
-    ///     fis >> v2[i];
-    ///
-    ///////////////////////////////////////////////////////////////////////////
+    Vacuta v1{"Milka"};
+
+    v1.treceTimpul(2);
+    v1.mulge();
+    v1.vindeLapte();
+
+    std::cout << v1;
+
+    Vacuta v2{v1};
+    Vacuta v3{"Zuzu"};
+    v3 = v1;
+
     return 0;
 }
