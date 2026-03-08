@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <algorithm>
 #include <utility>
 
@@ -17,23 +18,63 @@ public:
 
 class Vacuta {
 private:
-    std::string nume;
+    char* nume;
     Status foame;
     Status energie;
     int litriLapte;
     int bani;
 
 public:
-    explicit Vacuta(std::string nume_dat)
-        : nume{std::move(nume_dat)},
+    explicit Vacuta(const char* nume_dat)
+        : nume{nullptr},
           foame{"Foame", 100},
           energie{"Energie", 100},
           litriLapte{0},
           bani{10}
-    {}
+    {
+        if (nume_dat) {
+            nume = new char[std::strlen(nume_dat) + 1];
+            std::strcpy(nume, nume_dat);
+        }
+    }
+
+    // REGULA CELOR 3 - IMPLEMENTARE MANUALĂ
+    ~Vacuta() {
+        delete[] nume;
+    }
+
+    Vacuta(const Vacuta& other)
+        : nume{nullptr},
+          foame{other.foame},
+          energie{other.energie},
+          litriLapte{other.litriLapte},
+          bani{other.bani}
+    {
+        if (other.nume) {
+            nume = new char[std::strlen(other.nume) + 1];
+            std::strcpy(nume, other.nume);
+        }
+    }
+
+    Vacuta& operator=(const Vacuta& other) {
+        if (this != &other) {
+            char* nume_nou = nullptr;
+            if (other.nume) {
+                nume_nou = new char[std::strlen(other.nume) + 1];
+                std::strcpy(nume_nou, other.nume);
+            }
+            delete[] nume;
+            nume = nume_nou;
+            foame = other.foame;
+            energie = other.energie;
+            litriLapte = other.litriLapte;
+            bani = other.bani;
+        }
+        return *this;
+    }
 
     friend std::ostream& operator<<(std::ostream& os, const Vacuta& v) {
-        os << "\n--- Status " << v.nume << " ---\n"
+        os << "\n--- Status " << (v.nume ? v.nume : "Anonim") << " ---\n"
            << "Foame: " << v.foame.getValoare() << "/100\n"
            << "Energie: " << v.energie.getValoare() << "/100\n"
            << "Lapte: " << v.litriLapte << "L | Bani: " << v.bani << "\n";
@@ -71,7 +112,7 @@ int main() {
     v1.vindeLapte();
     std::cout << v1;
 
-    Vacuta v2 = v1;
+    Vacuta v2{v1};
     Vacuta v3{"Zuzu"};
     v3 = v1;
 
