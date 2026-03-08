@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <cstring>
 #include <algorithm>
 #include <utility>
 
@@ -18,65 +17,23 @@ public:
 
 class Vacuta {
 private:
-    char* nume;
+    std::string nume;
     Status foame;
     Status energie;
     int litriLapte;
     int bani;
 
 public:
-    explicit Vacuta(const char* nume_dat)
-        : nume{nullptr},
+    explicit Vacuta(std::string nume_dat)
+        : nume{std::move(nume_dat)},
           foame{"Foame", 100},
           energie{"Energie", 100},
           litriLapte{0},
           bani{10}
-    {
-        if (nume_dat) {
-            size_t len = std::strlen(nume_dat) + 1;
-            nume = new char[len];
-            std::copy(nume_dat, nume_dat + len, nume);
-        }
-    }
-
-    ~Vacuta() {
-        delete[] nume;
-    }
-
-    Vacuta(const Vacuta& other)
-        : nume{nullptr},
-          foame{other.foame},
-          energie{other.energie},
-          litriLapte{other.litriLapte},
-          bani{other.bani}
-    {
-        if (other.nume) {
-            size_t len = std::strlen(other.nume) + 1;
-            nume = new char[len];
-            std::copy(other.nume, other.nume + len, nume);
-        }
-    }
-
-    Vacuta& operator=(const Vacuta& other) {
-        if (this != &other) {
-            char* nume_nou = nullptr;
-            if (other.nume) {
-                size_t len = std::strlen(other.nume) + 1;
-                nume_nou = new char[len];
-                std::copy(other.nume, other.nume + len, nume_nou);
-            }
-            delete[] nume;
-            nume = nume_nou;
-            foame = other.foame;
-            energie = other.energie;
-            litriLapte = other.litriLapte;
-            bani = other.bani;
-        }
-        return *this;
-    }
+    {}
 
     friend std::ostream& operator<<(std::ostream& os, const Vacuta& v) {
-        os << "\n--- Status " << (v.nume ? v.nume : "Anonim") << " ---\n"
+        os << "\n--- Status " << v.nume << " ---\n"
            << "Foame: " << v.foame.getValoare() << "/100\n"
            << "Energie: " << v.energie.getValoare() << "/100\n"
            << "Lapte: " << v.litriLapte << "L | Bani: " << v.bani << "\n";
@@ -113,8 +70,10 @@ int main() {
     v1.mulge();
     v1.vindeLapte();
     std::cout << v1;
-    Vacuta v2{v1};
+
+    Vacuta v2 = v1;
     Vacuta v3{"Zuzu"};
     v3 = v1;
+
     return 0;
 }
