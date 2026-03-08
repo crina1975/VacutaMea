@@ -27,41 +27,41 @@ private:
 
 public:
     explicit Vacuta(const char* nume_dat)
-        : foame{"Foame", 100},
+        : nume{new char[std::strlen(nume_dat) + 1]},
+          foame{"Foame", 100},
           energie{"Energie", 100},
           litriLapte{0},
-          bani{10} {
-        nume = new char[std::strlen(nume_dat) + 1];
+          bani{10}
+    {
         std::strcpy(nume, nume_dat);
-        std::cout << "[LOG] S-a nascut vacuta " << nume << "\n";
     }
 
     ~Vacuta() {
         delete[] nume;
-        std::cout << "[LOG] Resurse eliberate (Destructor).\n";
     }
 
     Vacuta(const Vacuta& other)
-        : foame{other.foame},
+        : nume{new char[std::strlen(other.nume) + 1]},
+          foame{other.foame},
           energie{other.energie},
           litriLapte{other.litriLapte},
-          bani{other.bani} {
-        nume = new char[std::strlen(other.nume) + 1];
+          bani{other.bani}
+    {
         std::strcpy(nume, other.nume);
-        std::cout << "[LOG] Constructor de copiere apelat.\n";
     }
 
     Vacuta& operator=(const Vacuta& other) {
         if (this != &other) {
+            char* nume_nou = new char[std::strlen(other.nume) + 1];
+            std::strcpy(nume_nou, other.nume);
             delete[] nume;
-            nume = new char[std::strlen(other.nume) + 1];
-            std::strcpy(nume, other.nume);
+            nume = nume_nou;
+
             foame = other.foame;
             energie = other.energie;
             litriLapte = other.litriLapte;
             bani = other.bani;
         }
-        std::cout << "[LOG] Operator= apelat.\n";
         return *this;
     }
 
@@ -72,7 +72,6 @@ public:
            << "Lapte: " << v.litriLapte << "L | Bani: " << v.bani << "\n";
         return os;
     }
-
 
     void treceTimpul(int ore) {
         foame.modifica(-10 * ore);
@@ -87,16 +86,12 @@ public:
             int bonus = foame.getValoare() / 25;
             litriLapte += (5 + bonus);
             energie.modifica(-35);
-            std::cout << "[JOC] Ai muls " << 5 + bonus << " litri.\n";
-        } else {
-            std::cout << "[JOC] Vacuta e prea obosita!\n";
         }
     }
 
     void vindeLapte() {
         if (litriLapte > 0) {
             bani += litriLapte * 3;
-            std::cout << "[JOC] Ai vandut laptele pentru " << litriLapte * 3 << " bani.\n";
             litriLapte = 0;
         }
     }
@@ -104,7 +99,6 @@ public:
 
 int main() {
     Vacuta v1{"Milka"};
-
     v1.treceTimpul(2);
     v1.mulge();
     v1.vindeLapte();
