@@ -339,11 +339,69 @@ public:
 };
 
 //clasa 13
+class Contract {
+    std::string companie;
+    int necesarLapte;
+    int lapteColectat{0};
+    int recompensaBani;
+    int zileRamase;
+    bool finalizat{false};
+public:
+    Contract(std::string comp, int necesar, int rec, int zile)
+        : companie{std::move(comp)}, necesarLapte{necesar}, recompensaBani{rec}, zileRamase{zile} {}
+
+    [[nodiscard]] bool esteFinalizat() const { return finalizat; }
+    [[nodiscard]] bool esteExpirat() const { return zileRamase <= 0 && !finalizat; }
+    [[nodiscard]] int getRecompensa() const { return recompensaBani; }
+    [[nodiscard]] const std::string& getCompanie() const { return companie; }
+
+    int adaugaLapte(int cantitate) {
+        if (finalizat || esteExpirat()) return cantitate;
+        int spatiu = necesarLapte - lapteColectat;
+        if (cantitate >= spatiu) {
+            lapteColectat += spatiu;
+            finalizat = true;
+            return cantitate - spatiu;
+        }
+        lapteColectat += cantitate;
+        return 0;
+    }
+
+    void treceZiua() {
+        if (!finalizat && zileRamase > 0) zileRamase--;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Contract& c) {
+        os << "Contract " << c.companie << " [" << c.lapteColectat << "/" << c.necesarLapte << "L] ";
+        if (c.finalizat) os << "- FINALIZAT";
+        else if (c.esteExpirat()) os << "- EXPIRAT";
+        else os << "- Zile: " << c.zileRamase;
+        return os;
+    }
+};
+
+//clasa 14
+class CladireAuxiliara {
+    std::string nume;
+    int bonusProductie;
+    int costIntretinere;
+public:
+    CladireAuxiliara(std::string n, int bonus, int cost)
+        : nume{std::move(n)}, bonusProductie{bonus}, costIntretinere{cost} {}
+
+    [[nodiscard]] int aplicaBonus(int productie) const { return productie + bonusProductie; }
+    [[nodiscard]] int getCost() const { return costIntretinere; }
+    [[nodiscard]] const std::string& getNume() const { return nume; }
+};
+
+//clasa 15
 class Ferma {
     std::string numeF;
     std::string numeP;
     std::vector<Vacuta> cireada{};
     std::vector<Angajat> echipa{};
+    std::vector<Contract> contracte{};
+    std::vector<CladireAuxiliara> anexe{};
 
     Piata piataLocala{};
     Istoric jurnal{};
@@ -354,7 +412,6 @@ class Ferma {
 
     int bani{250};
     int stocLapte{0};
-    int nivelFerma{1};
     int capacitateMaxima{5};
     int ziuaCurenta{1};
     std::mt19937 generator{std::random_device{}()};
@@ -371,6 +428,21 @@ public:
 
     void angajeaza(const std::string& numeAngajat, int salariu) {
         echipa.emplace_back(numeAngajat, salariu);
+    }
+
+    void adaugaContract(const std::string& companie, int necesar, int recompensa, int zile) {
+        contracte.emplace_back(companie, necesar, recompensa, zile);
+        jurnal.adaugaEveniment("Contract semnat cu: " + companie);
+    }
+
+    void construiesteAnexa(const std::string& numeAnexa, int bonus, int intretinere, int pret) {
+        if (bani >= pret) {
+            bani -= pret;
+            anexe.emplace_back(numeAnexa, bonus, intretinere);
+            jurnal.adaugaEveniment("S-a construit: " + numeAnexa);
+        } else {
+            throw FermaException("Bani insuficienti pentru anexa " + numeAnexa);
+        }
     }
 
     void cumparaProvizii(const Magazin& magazin, const std::string& numeProdus, int cantitate) {
@@ -390,7 +462,7 @@ public:
         doc.trateazaCireada(cireada, bani, jurnal);
     }
 
-    void platesteAngajati() {
+    void platesteCheltuieli() {
         for (auto& angajat : echipa) {
             angajat.reseteazaZiua();
             if (bani >= angajat.cerereSalariu()) {
@@ -398,6 +470,13 @@ public:
                 angajat.plateste();
             } else {
                 jurnal.adaugaEveniment("AVERTISMENT: Nu am platit angajatul " + angajat.getNume());
+            }
+        }
+        for (const auto& anexa : anexe) {
+            if (bani >= anexa.getCost()) {
+                bani -= anexa.getCost();
+            } else {
+                jurnal.adaugaEveniment("AVERTISMENT: Fara bani de mentenanta pt " + anexa.getNume());
             }
         }
     }
@@ -408,6 +487,8 @@ public:
         meteo.schimbaVremea();
 
         jurnal.adaugaEveniment("--- ZIUA " + std::to_string(ziuaCurenta) + " --- Vreme: " + meteo.getNumeVreme());
+
+        for (auto& c : contracte) c.treceZiua();
 
         bool areTaur = std::ranges::any_of(cireada, [](const Vacuta& v){
             return v.getSex() == Sex::MASCUL && v.esteAdult();
@@ -444,15 +525,43 @@ public:
     void mulge() {
         int lapteObtinut = 0;
         for (auto& v : cireada) lapteObtinut += v.mulge();
+
+        if (lapteObtinut > 0) {
+            for (const auto& anexa : anexe) {
+                lapteObtinut = anexa.aplicaBonus(lapteObtinut);
+            }
+        }
         stocLapte += lapteObtinut;
     }
 
-    void vindeLapte() {
-        if (stocLapte > 0) {
-            int profit = stocLapte * piataLocala.getPretLapte();
-            bani += profit;
-            stocLapte = 0;
+    void proceseazaVanzari() {
+        int lapteRamas = stocLapte;
+
+        for (auto& c : contracte) {
+            if (!c.esteFinalizat() && !c.esteExpirat()) {
+                lapteRamas = c.adaugaLapte(lapteRamas);
+                if (c.esteFinalizat()) {
+                    bani += c.getRecompensa();
+                    jurnal.adaugaEveniment("Contract indeplinit pt " + c.getCompanie() + "!");
+                }
+            }
         }
+
+        std::erase_if(contracte, [&](const Contract& c) {
+            if (c.esteExpirat()) {
+                jurnal.adaugaEveniment("Contract expirat (" + c.getCompanie() + ")! Penalizare 20 bani.");
+                bani -= 20;
+                return true;
+            }
+            return c.esteFinalizat();
+        });
+
+        if (lapteRamas > 0) {
+            int profit = lapteRamas * piataLocala.getPretLapte();
+            bani += profit;
+            lapteRamas = 0;
+        }
+        stocLapte = lapteRamas;
     }
 
     void hranesteDinHambar(const Magazin& magazin, const std::string& numeProdus) {
@@ -467,6 +576,20 @@ public:
         }
     }
 
+    void gatesteVitel(size_t index, int secunde) {
+        if (index < cireada.size()) {
+            if (!cireada[index].esteAdult() && cireada[index].getSex() == Sex::MASCUL) {
+                Gratar g(secunde);
+                int profit = g.vindeMancare("friptura", piataLocala, trofee, jurnal);
+                bani += profit;
+                jurnal.adaugaEveniment("Vitel gatit. Profit: " + std::to_string(profit));
+                cireada.erase(cireada.begin() + static_cast<std::ptrdiff_t>(index));
+            } else {
+                throw FermaException("Poti gati doar vitei masculi non-adulti!");
+            }
+        }
+    }
+
     void afiseazaIstoric() const { jurnal.afiseazaIstoric(); }
     void afiseazaHambar() const { hambarCentral.afiseazaStoc(); }
 
@@ -474,7 +597,7 @@ public:
         os << "\n========================================\n"
            << " ZIUA " << f.ziuaCurenta << " | VREME: " << f.meteo.getNumeVreme() << "\n"
            << " FERMA: " << f.numeF << " | Proprietar: " << f.numeP
-           << "\n Bani: " << f.bani << " | Nivel: " << f.nivelFerma
+           << "\n Bani: " << f.bani << " | Contracte Active: " << f.contracte.size()
            << "\n Cireada (" << f.cireada.size() << "/" << f.capacitateMaxima << "):\n";
         for (const auto& v : f.cireada) os << "  " << v << "\n";
         return os << "========================================\n";
@@ -482,41 +605,72 @@ public:
 };
 
 int main() {
+    std::cout << "--- START SIMULARE COMPLETA FERMA ---\n";
     Magazin magazinComunal;
     magazinComunal.afiseazaCatalog();
 
     std::string np, nf;
-    std::cout << "Nume proprietar: ";
+    std::cout << "Introdu numele proprietarului: ";
     if (!(std::getline(std::cin, np))) return 0;
-    std::cout << "Nume ferma: ";
+    std::cout << "Introdu numele fermei: ";
     if (!(std::getline(std::cin, nf))) return 0;
 
     Ferma ferma(nf, np);
     ferma.inceputJoc();
-    ferma.angajeaza("Gheorghe", 15);
 
+    std::cout << "\n>>> TEST 1: Angajari, Cumparaturi si Cladiri <<<\n";
+    ferma.angajeaza("Vasile (Mulgator)", 10);
+    ferma.angajeaza("Ion (Ingrijitor)", 15);
     try {
-        std::cout << "\nCumparam mancare de la magazin...\n";
-        ferma.cumparaProvizii(magazinComunal, "Iarba", 10);
-        ferma.cumparaProvizii(magazinComunal, "Fan_Premium", 5);
-        ferma.afiseazaHambar();
+        ferma.cumparaProvizii(magazinComunal, "Iarba", 30);
+        ferma.cumparaProvizii(magazinComunal, "Fan_Premium", 15);
+        ferma.construiesteAnexa("Sistem Automat Irigatii", 5, 5, 80);
+        // Testam o eroare (nu mai avem bani pentru a 2-a cladire scumpa)
+        ferma.construiesteAnexa("Tractor Nou", 10, 20, 500);
     } catch (const FermaException& ex) {
-        std::cerr << "Eroare la cumparaturi: " << ex.what() << "\n";
+        std::cerr << " [EXCEPTIE ASTEPTATA] " << ex.what() << "\n";
     }
 
-    std::cout << "\n--- SIMULARE ZILE ---";
-    for(int i = 0; i < 5; ++i) {
-        ferma.platesteAngajati();
+    std::cout << "\n>>> TEST 2: Contracte Economice <<<\n";
+    ferma.adaugaContract("Lactate SA", 40, 200, 3); //contract scurt
+    ferma.adaugaContract("Mega Image", 100, 600, 10); //contract pe termen lung
 
-        ferma.hranesteDinHambar(magazinComunal, "Iarba");
+    std::cout << "\n>>> TEST 3: Simulare 7 Zile (Biologie, Vreme, Boli, Vanzari) <<<\n";
+    for(int i = 1; i <= 7; ++i) {
+        std::cout << "\n--- RULARE ZIUA " << i << " ---";
+        ferma.platesteCheltuieli();
+
+        //alternam mancarea pentru a testa hambarul
+        if (i % 2 == 0) ferma.hranesteDinHambar(magazinComunal, "Fan_Premium");
+        else ferma.hranesteDinHambar(magazinComunal, "Iarba");
 
         ferma.cheamaVeterinarul();
         ferma.mulge();
-        ferma.vindeLapte();
+        ferma.proceseazaVanzari();
         ferma.proceseazaBiologie();
-        std::cout << ferma;
     }
+    std::cout << ferma;
 
+    std::cout << "\n>>> TEST 4: Modulul Gratar si Realizari <<<\n";
+    //gatire gresita (adult)
+    try {
+        std::cout << " > Incerci sa gatesti un taur adult (Eroare)...";
+        ferma.gatesteVitel(1, 180);
+    } catch (const FermaException& ex) {
+         std::cerr << "\n [EXCEPTIE] " << ex.what() << "\n";
+    }
+    //gatire vitel (daca s-a nascut macar unul in 7 zile) - Perfect
+    try {
+        std::cout << " > Incerci sa gatesti un vitel mascul PERFECT (180s)...";
+        ferma.gatesteVitel(2, 180);
+    } catch (const FermaException&) {} // prindem si ignoram in caz ca era femela
+    //gatire Vitel - ars
+    try {
+        std::cout << "\n > Incerci sa gatesti alt vitel mascul ARS (300s)...";
+        ferma.gatesteVitel(3, 300);
+    } catch (const FermaException&) {}
+
+    std::cout << "\n>>> REZUMAT FINAL <<<\n";
     ferma.afiseazaHambar();
     ferma.afiseazaIstoric();
 
