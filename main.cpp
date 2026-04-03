@@ -509,7 +509,7 @@ public:
                 trofee.deblocheazaPui(jurnal);
             }
         }
-        for (auto& p : puiNoi) cireada.push_back(p);
+        for (const auto& p : puiNoi) cireada.push_back(p);
 
         std::erase_if(cireada, [&](const Vacuta& v) {
             if (v.vreaSaFuga()) {
