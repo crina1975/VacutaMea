@@ -4,7 +4,8 @@
 #include <vector>
 #include <utility>
 #include <random>
-#include <exception>
+#include <stdexcept>
+#include <map>
 
 enum class Sex { FEMELA, MASCUL };
 enum class StareCarne { NEFACUTA, PERFECTA, ARSA };
@@ -12,16 +13,14 @@ enum class TipVreme { INSORIT, PLOIOS, FURTUNA, CANICULA };
 enum class StareSanatate { SANATOASA, BOLNAVA, CRITICA };
 
 //exceptii custom
-class FermaException : public std::exception {
-    std::string mesaj;
+class FermaException : public std::runtime_error {
 public:
-    explicit FermaException(std::string msg) : mesaj{std::move(msg)} {}
-    [[nodiscard]] const char* what() const noexcept override { return mesaj.c_str(); }
+    explicit FermaException(const std::string& msg) : std::runtime_error(msg) {}
 };
 
 //clasa 1
 class Istoric {
-    std::vector<std::string> loguri;
+    std::vector<std::string> loguri{};
 public:
     void adaugaEveniment(const std::string& eveniment) {
         loguri.push_back(eveniment);
@@ -100,9 +99,9 @@ public:
 
 //clasa 5
 class Articol {
-    std::string nume;
-    int pret;
-    int putereSatietate;
+    std::string nume{"Nimic"};
+    int pret{0};
+    int putereSatietate{0};
 public:
     explicit Articol(std::string n = "Nimic", int p = 0, int sat = 0)
         : nume{std::move(n)}, pret{p}, putereSatietate{sat} {}
@@ -117,9 +116,59 @@ public:
 };
 
 //clasa 6
+class Magazin {
+    std::vector<Articol> catalog;
+public:
+    Magazin() {
+        catalog.emplace_back("Iarba", 10, 20);
+        catalog.emplace_back("Fan_Premium", 25, 50);
+        catalog.emplace_back("Concentrate", 50, 100);
+    }
+
+    [[nodiscard]] const Articol& cautaArticol(const std::string& numeCăutat) const {
+        for (const auto& art : catalog) {
+            if (art.getNume() == numeCăutat) return art;
+        }
+        throw FermaException("Articolul " + numeCăutat + " nu exista in magazin!");
+    }
+
+    void afiseazaCatalog() const {
+        std::cout << "\n=== CATALOG MAGAZIN ===\n";
+        for (const auto& art : catalog) {
+            std::cout << " - " << art << " | Ofera " << art.getPutereSatietate() << " energie.\n";
+        }
+    }
+};
+
+//clasa 7
+class Hambar {
+    std::map<std::string, int> stocuri{};
+public:
+    void adauga(const std::string& numeArticol, int cantitate) {
+        stocuri[numeArticol] += cantitate;
+    }
+
+    [[nodiscard]] bool consuma(const std::string& numeArticol) {
+        if (stocuri.contains(numeArticol) && stocuri[numeArticol] > 0) {
+            stocuri[numeArticol]--;
+            return true;
+        }
+        return false;
+    }
+
+    void afiseazaStoc() const {
+        std::cout << "\n=== STOC HAMBAR ===\n";
+        if (stocuri.empty()) std::cout << " Hambarul este gol!\n";
+        for (const auto& [nume, cantitate] : stocuri) {
+            std::cout << " > " << nume << ": " << cantitate << " portii\n";
+        }
+    }
+};
+
+//clasa 8
 class Status {
-    std::string nume;
-    int valoare;
+    std::string nume{"Parametru"};
+    int valoare{100};
 public:
     explicit Status(std::string n = "Parametru", int v = 100)
         : nume{std::move(n)}, valoare{v} {}
@@ -133,11 +182,11 @@ public:
     }
 };
 
-//clasa 7
+//clasa 9
 class Angajat {
     std::string nume;
-    int salariuZilnic;
-    bool platitAzi = false;
+    int salariuZilnic{0};
+    bool platitAzi{false};
 public:
     Angajat(std::string n, int salariu) : nume{std::move(n)}, salariuZilnic{salariu} {}
 
@@ -146,25 +195,24 @@ public:
 
     void plateste() { platitAzi = true; }
     void reseteazaZiua() { platitAzi = false; }
-    [[nodiscard]] bool esteMultumit() const { return platitAzi; }
 };
 
-//clasa 8
+//clasa 10
 class Vacuta {
     std::string nume;
-    Status foame;
-    Status energie;
-    int varsta;
-    Sex sex;
-    StareSanatate sanatate = StareSanatate::SANATOASA;
-    int contorEnergieMaxima = 0;
-    bool insarcinata = false;
-    int zileSarcina = 0;
+    Status foame{"Foame", 30};
+    Status energie{"Energie", 100};
+    int varsta{0};
+    Sex sex{Sex::FEMELA};
+    StareSanatate sanatate{StareSanatate::SANATOASA};
+    int contorEnergieMaxima{0};
+    bool insarcinata{false};
+    int zileSarcina{0};
     std::mt19937 generator{std::random_device{}()};
 
 public:
     explicit Vacuta(std::string n, int v, Sex s)
-        : nume{std::move(n)}, foame{"Foame", 30}, energie{"Energie", 100}, varsta{v}, sex{s} {}
+        : nume{std::move(n)}, varsta{v}, sex{s} {}
 
     Vacuta(const Vacuta& other) = default;
     Vacuta& operator=(const Vacuta& other) = default;
@@ -172,7 +220,6 @@ public:
 
     [[nodiscard]] bool esteAdult() const { return varsta >= 3; }
     [[nodiscard]] Sex getSex() const { return sex; }
-    [[nodiscard]] bool esteInsarcinata() const { return insarcinata; }
     [[nodiscard]] const std::string& getNume() const { return nume; }
     [[nodiscard]] bool vreaSaFuga() const { return foame.getValoare() >= 100; }
     [[nodiscard]] bool esteBolnava() const { return sanatate != StareSanatate::SANATOASA; }
@@ -190,17 +237,14 @@ public:
         int factorFoame = insarcinata ? 40 : 20;
         int factorEnergie = -10;
 
-        //influenta vremii
         if (vremeCurenta == TipVreme::CANICULA) factorFoame += 15;
         if (vremeCurenta == TipVreme::FURTUNA) factorEnergie -= 20;
 
-        //influenta sanatatii
         if (sanatate == StareSanatate::BOLNAVA) {
             factorEnergie -= 15;
             factorFoame += 10;
         }
 
-        //sansa de a se imbolnavi (10% sansa pe zi daca e sanatoasa)
         if (sanatate == StareSanatate::SANATOASA) {
             std::uniform_int_distribution<int> sansaBoala(1, 100);
             if (sansaBoala(generator) <= 10) sanatate = StareSanatate::BOLNAVA;
@@ -232,7 +276,7 @@ public:
     }
 
     int mulge() {
-        if (sanatate != StareSanatate::SANATOASA) return 0; //nu poti mulge o vaca bolnava
+        if (sanatate != StareSanatate::SANATOASA) return 0;
         if (esteAdult() && sex == Sex::FEMELA && energie.getValoare() >= 30) {
             energie.modifica(-30);
             return 10;
@@ -249,10 +293,10 @@ public:
     }
 };
 
-//clasa 9
+//clasa 11
 class Veterinar {
     std::string numeClinica;
-    int tarifTratament = 40;
+    int tarifTratament{40};
 public:
     explicit Veterinar(std::string nume) : numeClinica{std::move(nume)} {}
 
@@ -264,16 +308,16 @@ public:
                     v.vindeca();
                     jurnal.adaugaEveniment("Medic din " + numeClinica + ": " + v.getNume() + " a fost vindecata.");
                 } else {
-                    jurnal.adaugaEveniment("AVERTISMENT: Nu sunt bani pentru a trata pe " + v.getNume() + "!");
+                    jurnal.adaugaEveniment("AVERTISMENT: Nu sunt bani pentru tratament: " + v.getNume());
                 }
             }
         }
     }
 };
 
-//clasa 10
+//clasa 12
 class Gratar {
-    int timpGatireSecunde;
+    int timpGatireSecunde{0};
 public:
     explicit Gratar(int timp = 0) : timpGatireSecunde{timp} {}
 
@@ -294,41 +338,52 @@ public:
     }
 };
 
-//clasa 11
+//clasa 13
 class Ferma {
     std::string numeF;
     std::string numeP;
-    std::vector<Vacuta> cireada;
-    std::vector<Angajat> echipa;
+    std::vector<Vacuta> cireada{};
+    std::vector<Angajat> echipa{};
 
-    Piata piataLocala;
-    Istoric jurnal;
-    Vremea meteo;
-    Veterinar doc;
-    SistemRealizari trofee;
+    Piata piataLocala{};
+    Istoric jurnal{};
+    Vremea meteo{};
+    Veterinar doc{"Clinica VetHappy"};
+    SistemRealizari trofee{};
+    Hambar hambarCentral{};
 
-    int bani;
-    int stocLapte;
-    int nivelFerma;
-    int capacitateMaxima;
-    int ziuaCurenta;
+    int bani{250};
+    int stocLapte{0};
+    int nivelFerma{1};
+    int capacitateMaxima{5};
+    int ziuaCurenta{1};
     std::mt19937 generator{std::random_device{}()};
 
 public:
     Ferma(std::string nf, std::string np)
-        : numeF{std::move(nf)}, numeP{std::move(np)}, cireada{}, echipa{},
-          piataLocala{}, jurnal{}, meteo{}, doc{"Clinica VetHappy"}, trofee{},
-          bani{250}, stocLapte{0}, nivelFerma{1}, capacitateMaxima{5}, ziuaCurenta{1} {}
+        : numeF{std::move(nf)}, numeP{std::move(np)} {}
 
     void inceputJoc() {
         cireada.emplace_back("Milka", 3, Sex::FEMELA);
         cireada.emplace_back("Milk", 4, Sex::MASCUL);
-        jurnal.adaugaEveniment("Ferma a fost fondata. Animale initiale adaugate.");
+        jurnal.adaugaEveniment("Ferma a fost fondata.");
     }
 
     void angajeaza(const std::string& numeAngajat, int salariu) {
         echipa.emplace_back(numeAngajat, salariu);
-        jurnal.adaugaEveniment("A fost angajat " + numeAngajat + " (Salariu: " + std::to_string(salariu) + ").");
+    }
+
+    void cumparaProvizii(const Magazin& magazin, const std::string& numeProdus, int cantitate) {
+        const Articol& produs = magazin.cautaArticol(numeProdus);
+        int costTotal = produs.getPret() * cantitate;
+
+        if (bani >= costTotal) {
+            bani -= costTotal;
+            hambarCentral.adauga(numeProdus, cantitate);
+            jurnal.adaugaEveniment("Cumparat " + std::to_string(cantitate) + "x " + numeProdus);
+        } else {
+            throw FermaException("Fonduri insuficiente pentru a cumpara " + numeProdus);
+        }
     }
 
     void cheamaVeterinarul() {
@@ -342,21 +397,8 @@ public:
                 bani -= angajat.cerereSalariu();
                 angajat.plateste();
             } else {
-                jurnal.adaugaEveniment("AVERTISMENT: Nu am putut plati pe " + angajat.getNume() + "!");
+                jurnal.adaugaEveniment("AVERTISMENT: Nu am platit angajatul " + angajat.getNume());
             }
-        }
-    }
-
-    void upgradeFerma() {
-        int cost = nivelFerma * 200;
-        if (bani >= cost && capacitateMaxima < 10) {
-            bani -= cost;
-            nivelFerma++;
-            capacitateMaxima += 2;
-            std::cout << "[FERMA] Upgrade la nivelul " << nivelFerma << "!\n";
-            jurnal.adaugaEveniment("Upgrade ferma la nivelul " + std::to_string(nivelFerma) + ".");
-        } else {
-            throw FermaException("Fonduri insuficiente sau capacitate maxima atinsa pentru upgrade!");
         }
     }
 
@@ -390,7 +432,7 @@ public:
 
         std::erase_if(cireada, [&](const Vacuta& v) {
             if (v.vreaSaFuga()) {
-                jurnal.adaugaEveniment("TRAGEDIE: " + v.getNume() + " a fugit din cauza foamei!");
+                jurnal.adaugaEveniment("TRAGEDIE: " + v.getNume() + " a fugit!");
                 return true;
             }
             return false;
@@ -413,30 +455,20 @@ public:
         }
     }
 
-    void hranesteToate(const Articol& a) {
+    void hranesteDinHambar(const Magazin& magazin, const std::string& numeProdus) {
+        const Articol& produs = magazin.cautaArticol(numeProdus);
         for (auto& v : cireada) {
-            if (bani >= a.getPret()) {
-                bani -= a.getPret();
-                v.hraneste(a);
-            }
-        }
-    }
-
-    void gatesteVitel(size_t index, int secunde) {
-        if (index < cireada.size()) {
-            if (!cireada[index].esteAdult() && cireada[index].getSex() == Sex::MASCUL) {
-                Gratar g(secunde);
-                int profit = g.vindeMancare("friptura", piataLocala, trofee, jurnal);
-                bani += profit;
-                jurnal.adaugaEveniment("Vitel gatit. Profit: " + std::to_string(profit));
-                cireada.erase(cireada.begin() + static_cast<std::ptrdiff_t>(index));
+            if (hambarCentral.consuma(numeProdus)) {
+                v.hraneste(produs);
             } else {
-                throw FermaException("Poti gati doar vitei masculi non-adulti!");
+                jurnal.adaugaEveniment("ATENTIE: Hambarul a ramas fara " + numeProdus + "!");
+                break;
             }
         }
     }
 
     void afiseazaIstoric() const { jurnal.afiseazaIstoric(); }
+    void afiseazaHambar() const { hambarCentral.afiseazaStoc(); }
 
     friend std::ostream& operator<<(std::ostream& os, const Ferma& f) {
         os << "\n========================================\n"
@@ -450,10 +482,11 @@ public:
 };
 
 int main() {
-    Articol iarba("Iarba Standard", 10, 30);
+    Magazin magazinComunal;
+    magazinComunal.afiseazaCatalog();
 
     std::string np, nf;
-    std::cout << "Bun venit! Nume proprietar: ";
+    std::cout << "Nume proprietar: ";
     if (!(std::getline(std::cin, np))) return 0;
     std::cout << "Nume ferma: ";
     if (!(std::getline(std::cin, nf))) return 0;
@@ -462,10 +495,21 @@ int main() {
     ferma.inceputJoc();
     ferma.angajeaza("Gheorghe", 15);
 
-    std::cout << "\n--- SIMULARE ZILE (Vreme, Boli, Achievements) ---";
+    try {
+        std::cout << "\nCumparam mancare de la magazin...\n";
+        ferma.cumparaProvizii(magazinComunal, "Iarba", 10);
+        ferma.cumparaProvizii(magazinComunal, "Fan_Premium", 5);
+        ferma.afiseazaHambar();
+    } catch (const FermaException& ex) {
+        std::cerr << "Eroare la cumparaturi: " << ex.what() << "\n";
+    }
+
+    std::cout << "\n--- SIMULARE ZILE ---";
     for(int i = 0; i < 5; ++i) {
         ferma.platesteAngajati();
-        ferma.hranesteToate(iarba);
+
+        ferma.hranesteDinHambar(magazinComunal, "Iarba");
+
         ferma.cheamaVeterinarul();
         ferma.mulge();
         ferma.vindeLapte();
@@ -473,13 +517,7 @@ int main() {
         std::cout << ferma;
     }
 
-    std::cout << "\n--- TEST GRATAR (Realizare MasterChef) ---";
-    try {
-        ferma.gatesteVitel(2, 180);
-    } catch (const FermaException&) {
-        //ignoram eroarea in caz ca pe acea pozitie e femela sau un adult
-    }
-
+    ferma.afiseazaHambar();
     ferma.afiseazaIstoric();
 
     return 0;
