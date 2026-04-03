@@ -8,6 +8,8 @@
 
 enum class Sex { FEMELA, MASCUL };
 enum class StareCarne { NEFACUTA, PERFECTA, ARSA };
+enum class TipVreme { INSORIT, PLOIOS, FURTUNA, CANICULA };
+enum class StareSanatate { SANATOASA, BOLNAVA, CRITICA };
 
 //exceptii custom
 class FermaException : public std::exception {
@@ -49,6 +51,54 @@ public:
 };
 
 //clasa 3
+class Vremea {
+    TipVreme stadiuCurent = TipVreme::INSORIT;
+    std::mt19937 generator{std::random_device{}()};
+public:
+    void schimbaVremea() {
+        std::uniform_int_distribution<int> dist(0, 3);
+        stadiuCurent = static_cast<TipVreme>(dist(generator));
+    }
+    [[nodiscard]] TipVreme getVremeCurenta() const { return stadiuCurent; }
+
+    [[nodiscard]] std::string getNumeVreme() const {
+        switch(stadiuCurent) {
+            case TipVreme::INSORIT: return "Insorit";
+            case TipVreme::PLOIOS: return "Ploios";
+            case TipVreme::FURTUNA: return "Furtuna";
+            case TipVreme::CANICULA: return "Canicula";
+        }
+        return "Necunoscut";
+    }
+};
+
+//clasa 4
+class SistemRealizari {
+    bool primulPui = false;
+    bool bogatie = false;
+    bool maestruBucatar = false;
+public:
+    void verificaAvere(int bani, Istoric& jurnal) {
+        if (bani >= 500 && !bogatie) {
+            bogatie = true;
+            jurnal.adaugaEveniment("🏆 REALIZARE DEBLOCATA: Fermier Bogat (Ai strans 500+ bani)!");
+        }
+    }
+    void deblocheazaPui(Istoric& jurnal) {
+        if (!primulPui) {
+            primulPui = true;
+            jurnal.adaugaEveniment("🏆 REALIZARE DEBLOCATA: Miracolul Vietii (Primul pui nascut)!");
+        }
+    }
+    void deblocheazaBucatar(Istoric& jurnal) {
+        if (!maestruBucatar) {
+            maestruBucatar = true;
+            jurnal.adaugaEveniment("🏆 REALIZARE DEBLOCATA: MasterChef (Ai gatit perfect un vitel)!");
+        }
+    }
+};
+
+//clasa 5
 class Articol {
     std::string nume;
     int pret;
@@ -66,7 +116,7 @@ public:
     }
 };
 
-//clasa 4
+//clasa 6
 class Status {
     std::string nume;
     int valoare;
@@ -83,7 +133,7 @@ public:
     }
 };
 
-//clasa 5
+//clasa 7
 class Angajat {
     std::string nume;
     int salariuZilnic;
@@ -99,16 +149,18 @@ public:
     [[nodiscard]] bool esteMultumit() const { return platitAzi; }
 };
 
-//clasa 6
+//clasa 8
 class Vacuta {
     std::string nume;
     Status foame;
     Status energie;
     int varsta;
     Sex sex;
+    StareSanatate sanatate = StareSanatate::SANATOASA;
     int contorEnergieMaxima = 0;
     bool insarcinata = false;
     int zileSarcina = 0;
+    std::mt19937 generator{std::random_device{}()};
 
 public:
     explicit Vacuta(std::string n, int v, Sex s)
@@ -123,19 +175,41 @@ public:
     [[nodiscard]] bool esteInsarcinata() const { return insarcinata; }
     [[nodiscard]] const std::string& getNume() const { return nume; }
     [[nodiscard]] bool vreaSaFuga() const { return foame.getValoare() >= 100; }
+    [[nodiscard]] bool esteBolnava() const { return sanatate != StareSanatate::SANATOASA; }
 
     void ramaneInsarcinata() {
-        if (sex == Sex::FEMELA && esteAdult() && !insarcinata) {
+        if (sex == Sex::FEMELA && esteAdult() && !insarcinata && sanatate == StareSanatate::SANATOASA) {
             insarcinata = true;
             zileSarcina = 0;
         }
     }
 
-    void treceTimpul() {
+    void vindeca() { sanatate = StareSanatate::SANATOASA; }
+
+    void treceTimpul(TipVreme vremeCurenta) {
         int factorFoame = insarcinata ? 40 : 20;
+        int factorEnergie = -10;
+
+        //influenta vremii
+        if (vremeCurenta == TipVreme::CANICULA) factorFoame += 15;
+        if (vremeCurenta == TipVreme::FURTUNA) factorEnergie -= 20;
+
+        //influenta sanatatii
+        if (sanatate == StareSanatate::BOLNAVA) {
+            factorEnergie -= 15;
+            factorFoame += 10;
+        }
+
+        //sansa de a se imbolnavi (10% sansa pe zi daca e sanatoasa)
+        if (sanatate == StareSanatate::SANATOASA) {
+            std::uniform_int_distribution<int> sansaBoala(1, 100);
+            if (sansaBoala(generator) <= 10) sanatate = StareSanatate::BOLNAVA;
+        }
+
         foame.modifica(factorFoame);
-        energie.modifica(-10);
-        if (energie.getValoare() == 100) contorEnergieMaxima++;
+        energie.modifica(factorEnergie);
+
+        if (energie.getValoare() == 100 && sanatate == StareSanatate::SANATOASA) contorEnergieMaxima++;
         if (insarcinata) zileSarcina++;
     }
 
@@ -158,6 +232,7 @@ public:
     }
 
     int mulge() {
+        if (sanatate != StareSanatate::SANATOASA) return 0; //nu poti mulge o vaca bolnava
         if (esteAdult() && sex == Sex::FEMELA && energie.getValoare() >= 30) {
             energie.modifica(-30);
             return 10;
@@ -169,11 +244,34 @@ public:
         os << "[" << (v.sex == Sex::FEMELA ? "F" : "M") << "] " << v.nume
            << " (V:" << v.varsta << ") | " << v.foame << " | " << v.energie;
         if (v.insarcinata) os << " [INS]";
+        if (v.sanatate == StareSanatate::BOLNAVA) os << " [BOLNAVA]";
         return os;
     }
 };
 
-//clasa 7
+//clasa 9
+class Veterinar {
+    std::string numeClinica;
+    int tarifTratament = 40;
+public:
+    explicit Veterinar(std::string nume) : numeClinica{std::move(nume)} {}
+
+    void trateazaCireada(std::vector<Vacuta>& cireada, int& baniFerma, Istoric& jurnal) const {
+        for (auto& v : cireada) {
+            if (v.esteBolnava()) {
+                if (baniFerma >= tarifTratament) {
+                    baniFerma -= tarifTratament;
+                    v.vindeca();
+                    jurnal.adaugaEveniment("Medic din " + numeClinica + ": " + v.getNume() + " a fost vindecata.");
+                } else {
+                    jurnal.adaugaEveniment("AVERTISMENT: Nu sunt bani pentru a trata pe " + v.getNume() + "!");
+                }
+            }
+        }
+    }
+};
+
+//clasa 10
 class Gratar {
     int timpGatireSecunde;
 public:
@@ -185,9 +283,10 @@ public:
         return StareCarne::PERFECTA;
     }
 
-    [[nodiscard]] int vindeMancare(const std::string& tip, const Piata& piataCurenta) const {
+    [[nodiscard]] int vindeMancare(const std::string& tip, const Piata& piataCurenta, SistemRealizari& ach, Istoric& jurnal) const {
         StareCarne stare = verificaStare();
         if (stare == StareCarne::PERFECTA) {
+            ach.deblocheazaBucatar(jurnal);
             return (tip == "ciorba") ? (piataCurenta.getPretCarne() / 2) : piataCurenta.getPretCarne();
         }
         std::cout << "[GRATAR] Atentie: Carnea este " << (stare == StareCarne::ARSA ? "ARSA" : "NEFACUTA") << "!\n";
@@ -195,14 +294,18 @@ public:
     }
 };
 
-//clasa 8
+//clasa 11
 class Ferma {
     std::string numeF;
     std::string numeP;
     std::vector<Vacuta> cireada;
     std::vector<Angajat> echipa;
+
     Piata piataLocala;
     Istoric jurnal;
+    Vremea meteo;
+    Veterinar doc;
+    SistemRealizari trofee;
 
     int bani;
     int stocLapte;
@@ -213,7 +316,9 @@ class Ferma {
 
 public:
     Ferma(std::string nf, std::string np)
-        : numeF{std::move(nf)}, numeP{std::move(np)}, cireada{}, echipa{}, bani{150}, stocLapte{0}, nivelFerma{1}, capacitateMaxima{5}, ziuaCurenta{1} {}
+        : numeF{std::move(nf)}, numeP{std::move(np)}, cireada{}, echipa{},
+          piataLocala{}, jurnal{}, meteo{}, doc{"Clinica VetHappy"}, trofee{},
+          bani{250}, stocLapte{0}, nivelFerma{1}, capacitateMaxima{5}, ziuaCurenta{1} {}
 
     void inceputJoc() {
         cireada.emplace_back("Milka", 3, Sex::FEMELA);
@@ -226,13 +331,16 @@ public:
         jurnal.adaugaEveniment("A fost angajat " + numeAngajat + " (Salariu: " + std::to_string(salariu) + ").");
     }
 
+    void cheamaVeterinarul() {
+        doc.trateazaCireada(cireada, bani, jurnal);
+    }
+
     void platesteAngajati() {
         for (auto& angajat : echipa) {
             angajat.reseteazaZiua();
             if (bani >= angajat.cerereSalariu()) {
                 bani -= angajat.cerereSalariu();
                 angajat.plateste();
-                jurnal.adaugaEveniment("Platit salariu catre " + angajat.getNume() + ".");
             } else {
                 jurnal.adaugaEveniment("AVERTISMENT: Nu am putut plati pe " + angajat.getNume() + "!");
             }
@@ -245,8 +353,8 @@ public:
             bani -= cost;
             nivelFerma++;
             capacitateMaxima += 2;
-            std::cout << "[FERMA] Upgrade la nivelul " << nivelFerma << ". Capacitate: " << capacitateMaxima << "\n";
-            jurnal.adaugaEveniment("Upgrade ferma la nivelul " + std::to_string(nivelFerma) + " realizat.");
+            std::cout << "[FERMA] Upgrade la nivelul " << nivelFerma << "!\n";
+            jurnal.adaugaEveniment("Upgrade ferma la nivelul " + std::to_string(nivelFerma) + ".");
         } else {
             throw FermaException("Fonduri insuficiente sau capacitate maxima atinsa pentru upgrade!");
         }
@@ -255,7 +363,9 @@ public:
     void proceseazaBiologie() {
         ziuaCurenta++;
         piataLocala.fluctueazaPreturi();
-        jurnal.adaugaEveniment("A inceput ziua " + std::to_string(ziuaCurenta) + ". Preturile pe piata s-au actualizat.");
+        meteo.schimbaVremea();
+
+        jurnal.adaugaEveniment("--- ZIUA " + std::to_string(ziuaCurenta) + " --- Vreme: " + meteo.getNumeVreme());
 
         bool areTaur = std::ranges::any_of(cireada, [](const Vacuta& v){
             return v.getSex() == Sex::MASCUL && v.esteAdult();
@@ -263,44 +373,42 @@ public:
 
         std::vector<Vacuta> puiNoi;
         std::uniform_int_distribution<int> distribSex(0, 1);
+        std::uniform_int_distribution<int> distribNume(1, 999);
 
         for (auto& v : cireada) {
-            v.treceTimpul();
+            v.treceTimpul(meteo.getVremeCurenta());
             if (areTaur && v.getSex() == Sex::FEMELA && v.esteAdult()) v.ramaneInsarcinata();
 
             if (v.verificaNastere() && cireada.size() + puiNoi.size() < static_cast<size_t>(capacitateMaxima)) {
-                std::string numePui;
-                std::cout << "\n[NASTERE] O vaca a nascut! Introdu nume pentru pui: ";
-                std::cin >> numePui;
+                std::string numePui = "Vitelus_" + std::to_string(distribNume(generator));
                 Sex sexPui = (distribSex(generator) == 0) ? Sex::FEMELA : Sex::MASCUL;
                 puiNoi.emplace_back(numePui, 0, sexPui);
-                jurnal.adaugaEveniment("S-a nascut puiul " + numePui + ".");
+                trofee.deblocheazaPui(jurnal);
             }
         }
         for (auto& p : puiNoi) cireada.push_back(p);
 
         std::erase_if(cireada, [&](const Vacuta& v) {
             if (v.vreaSaFuga()) {
-                jurnal.adaugaEveniment("TRAGEDIE: Vaca " + v.getNume() + " a fugit din cauza foamei!");
+                jurnal.adaugaEveniment("TRAGEDIE: " + v.getNume() + " a fugit din cauza foamei!");
                 return true;
             }
             return false;
         });
+
+        trofee.verificaAvere(bani, jurnal);
     }
 
     void mulge() {
         int lapteObtinut = 0;
         for (auto& v : cireada) lapteObtinut += v.mulge();
         stocLapte += lapteObtinut;
-        jurnal.adaugaEveniment("S-au muls " + std::to_string(lapteObtinut) + "L de lapte azi.");
     }
 
     void vindeLapte() {
         if (stocLapte > 0) {
             int profit = stocLapte * piataLocala.getPretLapte();
             bani += profit;
-            std::cout << "[PIATA] Vandut " << stocLapte << "L lapte pentru " << profit << " bani. (Pret: " << piataLocala.getPretLapte() << ")\n";
-            jurnal.adaugaEveniment("Vandut lapte pentru " + std::to_string(profit) + " bani.");
             stocLapte = 0;
         }
     }
@@ -312,17 +420,15 @@ public:
                 v.hraneste(a);
             }
         }
-        jurnal.adaugaEveniment("Cireada a fost hranita cu " + a.getNume() + ".");
     }
 
     void gatesteVitel(size_t index, int secunde) {
         if (index < cireada.size()) {
             if (!cireada[index].esteAdult() && cireada[index].getSex() == Sex::MASCUL) {
                 Gratar g(secunde);
-                int profit = g.vindeMancare("friptura", piataLocala);
+                int profit = g.vindeMancare("friptura", piataLocala, trofee, jurnal);
                 bani += profit;
-                std::cout << "[GRATAR] " << cireada[index].getNume() << " gatit. Profit: " << profit << " (Pret piata: " << piataLocala.getPretCarne() << ")\n";
-                jurnal.adaugaEveniment("Vitelul " + cireada[index].getNume() + " a fost preparat si vandut.");
+                jurnal.adaugaEveniment("Vitel gatit. Profit: " + std::to_string(profit));
                 cireada.erase(cireada.begin() + static_cast<std::ptrdiff_t>(index));
             } else {
                 throw FermaException("Poti gati doar vitei masculi non-adulti!");
@@ -334,8 +440,9 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Ferma& f) {
         os << "\n========================================\n"
-           << " ZIUA " << f.ziuaCurenta << " | FERMA: " << f.numeF << " | Proprietar: " << f.numeP
-           << "\n Bani: " << f.bani << " | Nivel: " << f.nivelFerma << " | Angajati: " << f.echipa.size()
+           << " ZIUA " << f.ziuaCurenta << " | VREME: " << f.meteo.getNumeVreme() << "\n"
+           << " FERMA: " << f.numeF << " | Proprietar: " << f.numeP
+           << "\n Bani: " << f.bani << " | Nivel: " << f.nivelFerma
            << "\n Cireada (" << f.cireada.size() << "/" << f.capacitateMaxima << "):\n";
         for (const auto& v : f.cireada) os << "  " << v << "\n";
         return os << "========================================\n";
@@ -343,7 +450,7 @@ public:
 };
 
 int main() {
-    Articol fan("Fan Premium", 25, 60);
+    Articol iarba("Iarba Standard", 10, 30);
 
     std::string np, nf;
     std::cout << "Bun venit! Nume proprietar: ";
@@ -353,34 +460,24 @@ int main() {
 
     Ferma ferma(nf, np);
     ferma.inceputJoc();
-    ferma.angajeaza("Ion", 15);
+    ferma.angajeaza("Gheorghe", 15);
 
-    //test 1
-    std::cout << "\n--- TEST 1: Tratam Exceptiile Custom ---";
-    try {
-        ferma.upgradeFerma(); //nu sunt destui bani
-    } catch (const FermaException& e) {
-        std::cerr << "\n[EROARE PRINSĂ] " << e.what() << "\n";
-    }
-
-    //test 2
-    std::cout << "\n--- TEST 2: Biologie, Piata si Economie ---";
-    for(int i = 0; i < 3; ++i) {
+    std::cout << "\n--- SIMULARE ZILE (Vreme, Boli, Achievements) ---";
+    for(int i = 0; i < 5; ++i) {
         ferma.platesteAngajati();
-        ferma.hranesteToate(fan);
+        ferma.hranesteToate(iarba);
+        ferma.cheamaVeterinarul();
         ferma.mulge();
         ferma.vindeLapte();
         ferma.proceseazaBiologie();
+        std::cout << ferma;
     }
-    std::cout << ferma;
 
-    //test 3
-    std::cout << "\n--- TEST 3: Gratar si Validare Erori ---";
+    std::cout << "\n--- TEST GRATAR (Realizare MasterChef) ---";
     try {
-        std::cout << "\nIncercam sa gatim taurul adult de pe pozitia 1 (ar trebui sa dea eroare)...";
-        ferma.gatesteVitel(1, 180); //pe pozitia 1 este Milk (Adult), deci va arunca o exceptie
-    } catch (const FermaException& e) {
-        std::cerr << "\n[EROARE PRINSĂ] " << e.what() << "\n";
+        ferma.gatesteVitel(2, 180);
+    } catch (const FermaException&) {
+        //ignoram eroarea in caz ca pe acea pozitie e femela sau un adult
     }
 
     ferma.afiseazaIstoric();
