@@ -125,11 +125,11 @@ public:
         catalog.emplace_back("Concentrate", 50, 100);
     }
 
-    [[nodiscard]] const Articol& cautaArticol(const std::string& numeCăutat) const {
+    [[nodiscard]] const Articol& cautaArticol(const std::string& numeCautat) const {
         for (const auto& art : catalog) {
-            if (art.getNume() == numeCăutat) return art;
+            if (art.getNume() == numeCautat) return art;
         }
-        throw FermaException("Articolul " + numeCăutat + " nu exista in magazin!");
+        throw FermaException("Articolul " + numeCautat + " nu exista in magazin!");
     }
 
     void afiseazaCatalog() const {
