@@ -4,7 +4,6 @@
 #include <vector>
 #include <utility>
 #include <random>
-#include <stdexcept>
 #include <map>
 
 enum class Sex { FEMELA, MASCUL };
@@ -12,33 +11,38 @@ enum class StareCarne { NEFACUTA, PERFECTA, ARSA };
 enum class TipVreme { INSORIT, PLOIOS, FURTUNA, CANICULA };
 enum class StareSanatate { SANATOASA, BOLNAVA, CRITICA };
 
-//exceptii custom
-class FermaException : public std::runtime_error {
-public:
-    explicit FermaException(const std::string& msg) : std::runtime_error(msg) {}
-};
-
-//clasa 1
+// Clasa 1
 class Istoric {
+private:
     std::vector<std::string> loguri{};
 public:
+    Istoric() = default;
+
     void adaugaEveniment(const std::string& eveniment) {
         loguri.push_back(eveniment);
     }
-    void afiseazaIstoric() const {
-        std::cout << "\n=== JURNAL FERMA ===\n";
-        for (const auto& log : loguri) {
-            std::cout << " > " << log << "\n";
+
+    friend std::ostream& operator<<(std::ostream& os, const Istoric& istoric) {
+        os << "\n=== JURNAL FERMA ===\n";
+        if (istoric.loguri.empty()) {
+            os << " Niciun eveniment inregistrat.\n";
         }
+        for (const auto& log : istoric.loguri) {
+            os << " > " << log << "\n";
+        }
+        return os;
     }
 };
 
-//clasa 2
+// Clasa 2
 class Piata {
+private:
     int pretLapte = 5;
     int pretCarne = 80;
     std::mt19937 generator{std::random_device{}()};
 public:
+    Piata() = default;
+
     void fluctueazaPreturi() {
         std::uniform_int_distribution<int> distLapte(3, 8);
         std::uniform_int_distribution<int> distCarne(50, 120);
@@ -47,13 +51,20 @@ public:
     }
     [[nodiscard]] int getPretLapte() const { return pretLapte; }
     [[nodiscard]] int getPretCarne() const { return pretCarne; }
+
+    friend std::ostream& operator<<(std::ostream& os, const Piata& p) {
+        return os << "[Piata Locala] Lapte: " << p.pretLapte << " bani/L | Carne: " << p.pretCarne << " bani";
+    }
 };
 
-//clasa 3
+// Clasa 3
 class Vremea {
+private:
     TipVreme stadiuCurent = TipVreme::INSORIT;
     std::mt19937 generator{std::random_device{}()};
 public:
+    Vremea() = default;
+
     void schimbaVremea() {
         std::uniform_int_distribution<int> dist(0, 3);
         stadiuCurent = static_cast<TipVreme>(dist(generator));
@@ -69,14 +80,21 @@ public:
         }
         return "Necunoscut";
     }
+
+    friend std::ostream& operator<<(std::ostream& os, const Vremea& v) {
+        return os << "Vremea curenta este: " << v.getNumeVreme();
+    }
 };
 
-//clasa 4
+// Clasa 4
 class SistemRealizari {
+private:
     bool primulPui = false;
     bool bogatie = false;
     bool maestruBucatar = false;
 public:
+    SistemRealizari() = default;
+
     void verificaAvere(int bani, Istoric& jurnal) {
         if (bani >= 500 && !bogatie) {
             bogatie = true;
@@ -95,10 +113,20 @@ public:
             jurnal.adaugaEveniment("🏆 REALIZARE DEBLOCATA: MasterChef (Ai gatit perfect un vitel)!");
         }
     }
+
+    friend std::ostream& operator<<(std::ostream& os, const SistemRealizari& s) {
+        os << "Realizari Deblocate: ";
+        if (!s.primulPui && !s.bogatie && !s.maestruBucatar) os << "Niciuna.";
+        if (s.primulPui) os << "[Miracolul Vietii] ";
+        if (s.bogatie) os << "[Bogat] ";
+        if (s.maestruBucatar) os << "[MasterChef] ";
+        return os;
+    }
 };
 
-//clasa 5
+// Clasa 5
 class Articol {
+private:
     std::string nume{"Nimic"};
     int pret{0};
     int putereSatietate{0};
@@ -115,8 +143,9 @@ public:
     }
 };
 
-//clasa 6
+// Clasa 6 (regula celor 3)
 class Magazin {
+private:
     std::vector<Articol> catalog;
 public:
     Magazin() {
@@ -125,25 +154,44 @@ public:
         catalog.emplace_back("Concentrate", 50, 100);
     }
 
-    [[nodiscard]] const Articol& cautaArticol(const std::string& numeCautat) const {
+    ~Magazin() { catalog.clear(); }
+
+    Magazin(const Magazin& other) : catalog(other.catalog) {
+        std::cout << "[Sistem Memorie] Magazin copiat automat.\n";
+    }
+
+    Magazin& operator=(const Magazin& other) {
+        if (this != &other) {
+            catalog = other.catalog;
+            std::cout << "[Sistem Memorie] Magazin atribuit automat.\n";
+        }
+        return *this;
+    }
+
+    [[nodiscard]] Articol cautaArticol(const std::string& numeCautat) const {
         for (const auto& art : catalog) {
             if (art.getNume() == numeCautat) return art;
         }
-        throw FermaException("Articolul " + numeCautat + " nu exista in magazin!");
+        std::cout << "\n[EROARE] Articolul " << numeCautat << " nu exista in magazin!\n";
+        return Articol{"Eroare", 0, 0};
     }
 
-    void afiseazaCatalog() const {
-        std::cout << "\n=== CATALOG MAGAZIN ===\n";
-        for (const auto& art : catalog) {
-            std::cout << " - " << art << " | Ofera " << art.getPutereSatietate() << " energie.\n";
+    friend std::ostream& operator<<(std::ostream& os, const Magazin& m) {
+        os << "\n=== CATALOG MAGAZIN ===\n";
+        for (const auto& art : m.catalog) {
+            os << " - " << art << " | Ofera " << art.getPutereSatietate() << " energie.\n";
         }
+        return os;
     }
 };
 
-//clasa 7
+// Clasa 7
 class Hambar {
+private:
     std::map<std::string, int> stocuri{};
 public:
+    Hambar() = default;
+
     void adauga(const std::string& numeArticol, int cantitate) {
         stocuri[numeArticol] += cantitate;
     }
@@ -156,17 +204,19 @@ public:
         return false;
     }
 
-    void afiseazaStoc() const {
-        std::cout << "\n=== STOC HAMBAR ===\n";
-        if (stocuri.empty()) std::cout << " Hambarul este gol!\n";
-        for (const auto& [nume, cantitate] : stocuri) {
-            std::cout << " > " << nume << ": " << cantitate << " portii\n";
+    friend std::ostream& operator<<(std::ostream& os, const Hambar& h) {
+        os << "\n=== STOC HAMBAR ===\n";
+        if (h.stocuri.empty()) os << " Hambarul este gol!\n";
+        for (const auto& [nume, cantitate] : h.stocuri) {
+            os << " > " << nume << ": " << cantitate << " portii\n";
         }
+        return os;
     }
 };
 
-//clasa 8
+// Clasa 8
 class Status {
+private:
     std::string nume{"Parametru"};
     int valoare{100};
 public:
@@ -177,28 +227,35 @@ public:
         valoare = std::clamp(valoare + delta, 0, 100);
     }
     [[nodiscard]] int getValoare() const { return valoare; }
+
     friend std::ostream& operator<<(std::ostream& os, const Status& s) {
         return os << s.nume << ": " << s.valoare << "/100";
     }
 };
 
-//clasa 9
+// Clasa 9
 class Angajat {
+private:
     std::string nume;
     int salariuZilnic{0};
     bool platitAzi{false};
 public:
-    Angajat(std::string n, int salariu) : nume{std::move(n)}, salariuZilnic{salariu} {}
+    explicit Angajat(std::string n, int salariu) : nume{std::move(n)}, salariuZilnic{salariu} {}
 
     [[nodiscard]] int cerereSalariu() const { return salariuZilnic; }
     [[nodiscard]] const std::string& getNume() const { return nume; }
 
     void plateste() { platitAzi = true; }
     void reseteazaZiua() { platitAzi = false; }
+
+    friend std::ostream& operator<<(std::ostream& os, const Angajat& a) {
+        return os << "Angajat: " << a.nume << " | Salariu: " << a.salariuZilnic << " bani/zi";
+    }
 };
 
-//clasa 10
+// Clasa 10
 class Vacuta {
+private:
     std::string nume;
     Status foame{"Foame", 30};
     Status energie{"Energie", 100};
@@ -208,7 +265,6 @@ class Vacuta {
     int contorEnergieMaxima{0};
     bool insarcinata{false};
     int zileSarcina{0};
-    std::mt19937 generator{std::random_device{}()};
 
 public:
     explicit Vacuta(std::string n, int v, Sex s)
@@ -233,7 +289,7 @@ public:
 
     void vindeca() { sanatate = StareSanatate::SANATOASA; }
 
-    void treceTimpul(TipVreme vremeCurenta) {
+    void treceTimpul(TipVreme vremeCurenta, std::mt19937& generatorRef) {
         int factorFoame = insarcinata ? 40 : 20;
         int factorEnergie = -10;
 
@@ -247,7 +303,7 @@ public:
 
         if (sanatate == StareSanatate::SANATOASA) {
             std::uniform_int_distribution<int> sansaBoala(1, 100);
-            if (sansaBoala(generator) <= 10) sanatate = StareSanatate::BOLNAVA;
+            if (sansaBoala(generatorRef) <= 10) sanatate = StareSanatate::BOLNAVA;
         }
 
         foame.modifica(factorFoame);
@@ -293,8 +349,9 @@ public:
     }
 };
 
-//clasa 11
+// Clasa 11
 class Veterinar {
+private:
     std::string numeClinica;
     int tarifTratament{40};
 public:
@@ -313,10 +370,15 @@ public:
             }
         }
     }
+
+    friend std::ostream& operator<<(std::ostream& os, const Veterinar& v) {
+        return os << "Doctor Veterinar la " << v.numeClinica << " (Tarif: " << v.tarifTratament << " bani)";
+    }
 };
 
-//clasa 12
+// Clasa 12
 class Gratar {
+private:
     int timpGatireSecunde{0};
 public:
     explicit Gratar(int timp = 0) : timpGatireSecunde{timp} {}
@@ -338,8 +400,9 @@ public:
     }
 };
 
-//clasa 13
+// Clasa 13
 class Contract {
+private:
     std::string companie;
     int necesarLapte;
     int lapteColectat{0};
@@ -347,7 +410,7 @@ class Contract {
     int zileRamase;
     bool finalizat{false};
 public:
-    Contract(std::string comp, int necesar, int rec, int zile)
+    explicit Contract(std::string comp, int necesar, int rec, int zile)
         : companie{std::move(comp)}, necesarLapte{necesar}, recompensaBani{rec}, zileRamase{zile} {}
 
     [[nodiscard]] bool esteFinalizat() const { return finalizat; }
@@ -380,22 +443,28 @@ public:
     }
 };
 
-//clasa 14
+// Clasa 14
 class CladireAuxiliara {
+private:
     std::string nume;
     int bonusProductie;
     int costIntretinere;
 public:
-    CladireAuxiliara(std::string n, int bonus, int cost)
+    explicit CladireAuxiliara(std::string n, int bonus, int cost)
         : nume{std::move(n)}, bonusProductie{bonus}, costIntretinere{cost} {}
 
     [[nodiscard]] int aplicaBonus(int productie) const { return productie + bonusProductie; }
     [[nodiscard]] int getCost() const { return costIntretinere; }
     [[nodiscard]] const std::string& getNume() const { return nume; }
+
+    friend std::ostream& operator<<(std::ostream& os, const CladireAuxiliara& c) {
+        return os << "Cladire: " << c.nume << " (Bonus: +" << c.bonusProductie << "L lapte)";
+    }
 };
 
-//clasa 15
+// Clasa 15
 class Ferma {
+private:
     std::string numeF;
     std::string numeP;
     std::vector<Vacuta> cireada{};
@@ -417,7 +486,7 @@ class Ferma {
     std::mt19937 generator{std::random_device{}()};
 
 public:
-    Ferma(std::string nf, std::string np)
+    explicit Ferma(std::string nf, std::string np)
         : numeF{std::move(nf)}, numeP{std::move(np)} {}
 
     void inceputJoc() {
@@ -441,12 +510,14 @@ public:
             anexe.emplace_back(numeAnexa, bonus, intretinere);
             jurnal.adaugaEveniment("S-a construit: " + numeAnexa);
         } else {
-            throw FermaException("Bani insuficienti pentru anexa " + numeAnexa);
+            std::cout << "\n[EROARE] Bani insuficienti pentru a construi " << numeAnexa << "!\n";
         }
     }
 
     void cumparaProvizii(const Magazin& magazin, const std::string& numeProdus, int cantitate) {
-        const Articol& produs = magazin.cautaArticol(numeProdus);
+        Articol produs = magazin.cautaArticol(numeProdus);
+        if (produs.getNume() == "Eroare") return;
+
         int costTotal = produs.getPret() * cantitate;
 
         if (bani >= costTotal) {
@@ -454,7 +525,7 @@ public:
             hambarCentral.adauga(numeProdus, cantitate);
             jurnal.adaugaEveniment("Cumparat " + std::to_string(cantitate) + "x " + numeProdus);
         } else {
-            throw FermaException("Fonduri insuficiente pentru a cumpara " + numeProdus);
+            std::cout << "\n[EROARE] Fonduri insuficiente pentru a cumpara " << cantitate << "x " << numeProdus << "!\n";
         }
     }
 
@@ -499,7 +570,8 @@ public:
         std::uniform_int_distribution<int> distribNume(1, 999);
 
         for (auto& v : cireada) {
-            v.treceTimpul(meteo.getVremeCurenta());
+            v.treceTimpul(meteo.getVremeCurenta(), generator);
+
             if (areTaur && v.getSex() == Sex::FEMELA && v.esteAdult()) v.ramaneInsarcinata();
 
             if (v.verificaNastere() && cireada.size() + puiNoi.size() < static_cast<size_t>(capacitateMaxima)) {
@@ -565,7 +637,9 @@ public:
     }
 
     void hranesteDinHambar(const Magazin& magazin, const std::string& numeProdus) {
-        const Articol& produs = magazin.cautaArticol(numeProdus);
+        Articol produs = magazin.cautaArticol(numeProdus);
+        if (produs.getNume() == "Eroare") return;
+
         for (auto& v : cireada) {
             if (hambarCentral.consuma(numeProdus)) {
                 v.hraneste(produs);
@@ -585,13 +659,17 @@ public:
                 jurnal.adaugaEveniment("Vitel gatit. Profit: " + std::to_string(profit));
                 cireada.erase(cireada.begin() + static_cast<std::ptrdiff_t>(index));
             } else {
-                throw FermaException("Poti gati doar vitei masculi non-adulti!");
+                std::cout << "\n[EROARE] Poti gati doar vitei masculi care nu au ajuns la stadiul de adult!\n";
             }
+        } else {
+            std::cout << "\n[EROARE] Nu exista nicio vacuta la indexul " << index << "!\n";
         }
     }
 
-    void afiseazaIstoric() const { jurnal.afiseazaIstoric(); }
-    void afiseazaHambar() const { hambarCentral.afiseazaStoc(); }
+
+    [[nodiscard]] const Istoric& getIstoric() const { return jurnal; }
+    [[nodiscard]] const Hambar& getHambar() const { return hambarCentral; }
+    [[nodiscard]] const Piata& getPiata() const { return piataLocala; }
 
     friend std::ostream& operator<<(std::ostream& os, const Ferma& f) {
         os << "\n========================================\n"
@@ -600,6 +678,10 @@ public:
            << "\n Bani: " << f.bani << " | Contracte Active: " << f.contracte.size()
            << "\n Cireada (" << f.cireada.size() << "/" << f.capacitateMaxima << "):\n";
         for (const auto& v : f.cireada) os << "  " << v << "\n";
+
+        os << "\n Angajati:\n";
+        for (const auto& a : f.echipa) os << "  " << a << "\n";
+
         return os << "========================================\n";
     }
 };
@@ -607,13 +689,12 @@ public:
 int main() {
     std::cout << "--- START SIMULARE COMPLETA FERMA ---\n";
     Magazin magazinComunal;
-    magazinComunal.afiseazaCatalog();
 
-    std::string np, nf;
-    std::cout << "Introdu numele proprietarului: ";
-    if (!(std::getline(std::cin, np))) return 0;
-    std::cout << "Introdu numele fermei: ";
-    if (!(std::getline(std::cin, nf))) return 0;
+
+    std::cout << magazinComunal;
+
+    std::string np = "Flavius";
+    std::string nf = "Ferma Vesela";
 
     Ferma ferma(nf, np);
     ferma.inceputJoc();
@@ -621,26 +702,23 @@ int main() {
     std::cout << "\n>>> TEST 1: Angajari, Cumparaturi si Cladiri <<<\n";
     ferma.angajeaza("Vasile (Mulgator)", 10);
     ferma.angajeaza("Ion (Ingrijitor)", 15);
-    try {
-        ferma.cumparaProvizii(magazinComunal, "Iarba", 30);
-        ferma.cumparaProvizii(magazinComunal, "Fan_Premium", 15);
-        ferma.construiesteAnexa("Sistem Automat Irigatii", 5, 5, 80);
-        // Testam o eroare (nu mai avem bani pentru a 2-a cladire scumpa)
-        ferma.construiesteAnexa("Tractor Nou", 10, 20, 500);
-    } catch (const FermaException& ex) {
-        std::cerr << " [EXCEPTIE ASTEPTATA] " << ex.what() << "\n";
-    }
+
+    ferma.cumparaProvizii(magazinComunal, "Iarba", 30);
+    ferma.cumparaProvizii(magazinComunal, "Fan_Premium", 15);
+    ferma.construiesteAnexa("Sistem Automat Irigatii", 5, 5, 80);
+
+
+    ferma.construiesteAnexa("Tractor Nou", 10, 20, 500);
 
     std::cout << "\n>>> TEST 2: Contracte Economice <<<\n";
-    ferma.adaugaContract("Lactate SA", 40, 200, 3); //contract scurt
-    ferma.adaugaContract("Mega Image", 100, 600, 10); //contract pe termen lung
+    ferma.adaugaContract("Lactate SA", 40, 200, 3);
+    ferma.adaugaContract("Mega Image", 100, 600, 10);
 
     std::cout << "\n>>> TEST 3: Simulare 7 Zile (Biologie, Vreme, Boli, Vanzari) <<<\n";
     for(int i = 1; i <= 7; ++i) {
         std::cout << "\n--- RULARE ZIUA " << i << " ---";
         ferma.platesteCheltuieli();
 
-        //alternam mancarea pentru a testa hambarul
         if (i % 2 == 0) ferma.hranesteDinHambar(magazinComunal, "Fan_Premium");
         else ferma.hranesteDinHambar(magazinComunal, "Iarba");
 
@@ -652,27 +730,27 @@ int main() {
     std::cout << ferma;
 
     std::cout << "\n>>> TEST 4: Modulul Gratar si Realizari <<<\n";
-    //gatire gresita (adult)
-    try {
-        std::cout << " > Incerci sa gatesti un taur adult (Eroare)...";
-        ferma.gatesteVitel(1, 180);
-    } catch (const FermaException& ex) {
-         std::cerr << "\n [EXCEPTIE] " << ex.what() << "\n";
-    }
-    //gatire vitel (daca s-a nascut macar unul in 7 zile) - Perfect
-    try {
-        std::cout << " > Incerci sa gatesti un vitel mascul PERFECT (180s)...";
-        ferma.gatesteVitel(2, 180);
-    } catch (const FermaException&) {} // prindem si ignoram in caz ca era femela
-    //gatire Vitel - ars
-    try {
-        std::cout << "\n > Incerci sa gatesti alt vitel mascul ARS (300s)...";
-        ferma.gatesteVitel(3, 300);
-    } catch (const FermaException&) {}
+    std::cout << "\n > Incerci sa gatesti un taur adult (Va afisa Eroare)...";
+    ferma.gatesteVitel(1, 180);
+
+    std::cout << "\n > Incerci sa gatesti un vitel inexistent (Va afisa Eroare)...";
+    ferma.gatesteVitel(100, 180);
+
+    std::cout << "\n > Incerci sa gatesti un vitel mascul PERFECT (180s)...";
+    ferma.gatesteVitel(2, 180);
+
+    std::cout << "\n > Incerci sa gatesti alt vitel mascul ARS (300s)...";
+    ferma.gatesteVitel(3, 300);
+
+    std::cout << "\n\n>>> TEST 5: Regula celor 3 (Academic Requirement) <<<\n";
+    Magazin magazinCopie = magazinComunal;
+    Magazin altMagazin;
+    altMagazin = magazinComunal;
 
     std::cout << "\n>>> REZUMAT FINAL <<<\n";
-    ferma.afiseazaHambar();
-    ferma.afiseazaIstoric();
+    std::cout << ferma.getHambar();
+    std::cout << ferma.getPiata() << "\n";
+    std::cout << ferma.getIstoric();
 
     return 0;
 }
