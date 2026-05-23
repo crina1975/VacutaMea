@@ -4,7 +4,7 @@
 
 // Constructorul apelează constructorul de bază și inițializează atributele specifice
 Vacuta::Vacuta(std::string n, int v, Sex s)
-    : Animal(std::move(n), v), sex{s} {}
+    : nume{std::move(n)}, varsta{v}, sex{s} {}
 
 // Implementări ale metodelor publice (NVI pattern - delegare către metodele virtuale private)
 bool Vacuta::esteAdult() const { return varsta >= 3; }

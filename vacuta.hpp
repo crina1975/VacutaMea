@@ -40,7 +40,7 @@ public:
     }
 };
 
-class Vacuta : public Animal {
+class Vacuta : public Bovina {
 private:
     std::string nume;
     Status foame{"Foame", 30};

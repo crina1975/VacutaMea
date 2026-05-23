@@ -1,4 +1,5 @@
 #include "ferma.hpp"
+#include "vacuta.hpp"
 
 Ferma::Ferma(std::string nf, std::string np)
     : numeF{std::move(nf)}, numeP{std::move(np)} {}
