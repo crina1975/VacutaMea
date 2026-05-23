@@ -1,4 +1,4 @@
-#include "Vacuta.h"
+#include "vacuta.h"
 
 Vacuta::Vacuta(std::string n, int v, Sex s)
     : Animal(std::move(n), v, s), nivelFoame(30), nivelEnergie(100), sanatate(StareSanatate::SANATOASA) {}
@@ -7,14 +7,12 @@ Vacuta::Vacuta(std::string n, int v, Sex s)
 Animal* Vacuta::clone() const {
     return new Vacuta(*this);
 }
-Animal* Vacuta::clone() const {
-    return new Vacuta(*this);
-}
 
 void Vacuta::scoateSunet() const {
     std::cout << nume << " face: Muuuuu!\n";
 }
 
+// cppcheck-suppress unusedFunction
 int Vacuta::mulge() {
     if (sanatate == StareSanatate::SANATOASA && esteAdult() && sex == Sex::FEMELA) {
         return 10;

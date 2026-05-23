@@ -1,4 +1,4 @@
-#include "Ferma.h"
+#include "ferma.h"
 #include <utility>
 
 Ferma::Ferma(std::string nf) : numeF(std::move(nf)), bani(250) {}
@@ -9,10 +9,6 @@ Ferma::~Ferma() {
     }
 }
 
-// cppcheck-suppress unusedFunction
-void Ferma::adunaResurse() {
-    int lapteTotal = 0;
-}
 Ferma::Ferma(const Ferma& other) : numeF(other.numeF), bani(other.bani) {
     for (const auto* a : other.animale) {
         animale.push_back(a->clone());
@@ -31,10 +27,12 @@ Ferma& Ferma::operator=(Ferma other) {
     return *this;
 }
 
+// cppcheck-suppress unusedFunction
 void Ferma::adaugaAnimal(Animal* animalNou) {
     animale.push_back(animalNou);
 }
 
+// cppcheck-suppress unusedFunction
 void Ferma::adunaResurse() {
     int lapteTotal = 0;
     int ouaTotal = 0;
@@ -52,6 +50,7 @@ void Ferma::adunaResurse() {
     std::cout << "S-au adunat: " << lapteTotal << "L lapte si " << ouaTotal << " oua.\n";
 }
 
+// cppcheck-suppress unusedFunction
 void Ferma::plateste(int cost) {
     if (bani < cost) {
         throw EroareFaliment(std::to_string(cost) + " bani necesari");
@@ -59,6 +58,7 @@ void Ferma::plateste(int cost) {
     bani -= cost;
 }
 
+// cppcheck-suppress unusedFunction
 void Ferma::afisareDetalii() const {
     std::cout << "=== " << numeF << " ===\nBani: " << bani << "\nAnimale:\n";
     for (const auto* a : animale) {

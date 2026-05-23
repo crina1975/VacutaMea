@@ -1,7 +1,7 @@
 #ifndef VACUTA_H
 #define VACUTA_H
 
-#include "Animal.h"
+#include "animal.h"
 
 enum class StareSanatate { SANATOASA, BOLNAVA, CRITICA };
 

@@ -1,7 +1,7 @@
 #ifndef GAINA_H
 #define GAINA_H
 
-#include "Animal.h"
+#include "animal.h"
 
 class Gaina : public Animal {
 public:
