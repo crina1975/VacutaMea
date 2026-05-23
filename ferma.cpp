@@ -55,12 +55,12 @@ void Ferma::inceputJoc() {
 void Ferma::angajeaza(const std::string& numeAngajat, int salariu) {
     echipa.emplace_back(numeAngajat, salariu);
 }
-
+// cppcheck-suppress unusedFunction
 void Ferma::adaugaContract(const std::string& companie, int necesar, int recompensa, int zile) {
     contracte.emplace_back(companie, necesar, recompensa, zile);
     jurnal.adaugaEveniment("Contract semnat cu: " + companie);
 }
-
+// cppcheck-suppress unusedFunction
 void Ferma::construiesteAnexa(const std::string& numeAnexa, int bonus, int intretinere, int pret) {
     if (bani >= pret) {
         bani -= pret;
@@ -70,7 +70,7 @@ void Ferma::construiesteAnexa(const std::string& numeAnexa, int bonus, int intre
         std::cout << "\n[EROARE] Bani insuficienti pentru a construi " << numeAnexa << "!\n";
     }
 }
-
+// cppcheck-suppress unusedFunction
 void Ferma::cumparaProvizii(const Magazin& magazin, const std::string& numeProdus, int cantitate) {
     Articol produs = magazin.cautaArticol(numeProdus);
     if (produs.getNume() == "Eroare") return;
@@ -84,7 +84,7 @@ void Ferma::cumparaProvizii(const Magazin& magazin, const std::string& numeProdu
         std::cout << "\n[EROARE] Fonduri insuficiente pentru a cumpara " << cantitate << "x " << numeProdus << "!\n";
     }
 }
-
+// cppcheck-suppress unusedFunction
 void Ferma::cheamaVeterinarul() {
     doc.trateazaCireada(cireada, bani, jurnal);
 }
@@ -210,7 +210,7 @@ void Ferma::hranesteDinHambar(const Magazin& magazin, const std::string& numePro
         }
     }
 }
-
+// cppcheck-suppress unusedFunction
 void Ferma::gatesteVitel(size_t index, int secunde) {
     if (index >= cireada.size()) {
         std::cout << "\n[EROARE] Nu exista nicio vacuta la indexul " << index << "!\n";
