@@ -11,7 +11,7 @@ protected:
     std::string nume;
     int varsta;
     int energie{100}; // Inițializare în-clasă (recomandată de Clang-Tidy)
-    const int id;
+    int id;
 
     // Atribut static pentru id-uri unice
     static int contor_animale;
