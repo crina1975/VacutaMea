@@ -1,26 +1,15 @@
-#include "animal.h"
+#include "Animal.hpp"
+#include "Exceptii.hpp"
 
-int Animal::contorAnimale = 0;
+// Initializarea atributului static (obligatoriu intr-un singur fisier .cpp)
+int Animal::contor_id = 0;
 
-Animal::Animal(std::string n, int v, Sex s)
-    : nume(std::move(n)), varsta(v), sex(s), idAnimal(++contorAnimale) {
-    if (varsta < 0) {
-        throw EroareAnimalInvalid(nume);
+Animal::Animal(std::string n, int v) : nume(std::move(n)), varsta(v), id(++contor_id) {
+    // THROW IN CONSTRUCTOR - Validam datele; daca sunt gresite, obiectul nu se mai creeaza
+    if (nume.empty()) {
+        throw EroareParametru("Numele animalului nu poate fi gol!");
     }
-}
-
-Animal::~Animal() = default;
-
-void Animal::afisare(std::ostream& os) const {
-    os << "[" << idAnimal << "] " << nume << " (V: " << varsta << ")";
-}
-
-int Animal::getId() const { return idAnimal; }
-Sex Animal::getSex() const { return sex; }
-bool Animal::esteAdult() const { return varsta >= 3; }
-const std::string& Animal::getNume() const { return nume; }
-
-std::ostream& operator<<(std::ostream& os, const Animal& a) {
-    a.afisare(os);
-    return os;
+    if (varsta < 0) {
+        throw EroareParametru("Varsta nu poate fi negativa!");
+    }
 }

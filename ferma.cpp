@@ -1,68 +1,71 @@
-#include "ferma.h"
-#include <utility>
+#include "Ferma.hpp"
+#include "Vacuta.hpp"
+#include "Gaina.hpp"
+#include "Exceptii.hpp"
+#include <iostream>
 
-Ferma::Ferma(std::string nf) : numeF(std::move(nf)), bani(250) {}
+Ferma::Ferma(std::string nume, int bugetInitial) : numeFerma(std::move(nume)), buget(bugetInitial) {
+    if (buget < 0) throw EroareFonduri("Bugetul initial nu poate fi negativ.");
+}
 
+// 1. Constructorul de Copiere (Deep Copy via clone())
+Ferma::Ferma(const Ferma& other) : numeFerma(other.numeFerma), buget(other.buget) {
+    for (const auto* animal : other.animale) {
+        animale.push_back(animal->clone());
+    }
+}
+
+// 2. Destructorul
 Ferma::~Ferma() {
-    for (auto* a : animale) {
-        delete a;
+    for (auto* animal : animale) {
+        delete animal;
     }
-    animale.clear(); // Garantam curatarea pentru Valgrind
+    animale.clear();
 }
 
-Ferma::Ferma(const Ferma& other) : numeF(other.numeF), bani(other.bani) {
-    for (const auto* a : other.animale) {
-        animale.push_back(a->clone());
-    }
-}
-
-void swap(Ferma& f1, Ferma& f2) {
+// Functia de swap definita custom
+void swap(Ferma& f1, Ferma& f2) noexcept {
     using std::swap;
-    swap(f1.numeF, f2.numeF);
-    swap(f1.bani, f2.bani);
+    swap(f1.numeFerma, f2.numeFerma);
+    swap(f1.buget, f2.buget);
     swap(f1.animale, f2.animale);
 }
 
+// 3. Operatorul de Atribuire (Copy-and-Swap)
 Ferma& Ferma::operator=(Ferma other) {
     swap(*this, other);
     return *this;
 }
 
-// cppcheck-suppress unusedFunction
-void Ferma::adaugaAnimal(Animal* animalNou) {
-    animale.push_back(animalNou);
+void Ferma::adaugaAnimal(const Animal& a) {
+    // Apelam clona polimorfica a animalului trimis prin referinta catre baza
+    animale.push_back(a.clone());
+    std::cout << "-> A fost adaugat un animal nou in ferma " << numeFerma << "\n";
 }
 
-// cppcheck-suppress unusedFunction
-void Ferma::adunaResurse() {
-    int lapteTotal = 0;
-    int ouaTotal = 0;
+void Ferma::colecteazaProductia() const {
+    int totalLapte = 0;
+    int totalOua = 0;
 
-    for (auto* animal : animale) {
-        animal->scoateSunet();
-
-        if (auto* vaca = dynamic_cast<Vacuta*>(animal)) {
-            lapteTotal += vaca->mulge();
+    for (const auto* animal : animale) {
+        // DYNAMIC_CAST: Aflam tipul derivat real la runtime pentru a apela metode specifice
+        if (const Vacuta* v = dynamic_cast<const Vacuta*>(animal)) {
+            totalLapte += v->mulge();
         }
-        else if (auto* gaina = dynamic_cast<Gaina*>(animal)) {
-            ouaTotal += gaina->adunaOua();
+        else if (const Gaina* g = dynamic_cast<const Gaina*>(animal)) {
+            totalOua += g->adunaOua();
         }
     }
-    std::cout << "S-au adunat: " << lapteTotal << "L lapte si " << ouaTotal << " oua.\n";
+
+    std::cout << "\n=== Productie Colectata ===\n";
+    std::cout << "Lapte: " << totalLapte << " litri\n";
+    std::cout << "Oua: " << totalOua << " bucati\n";
 }
 
-// cppcheck-suppress unusedFunction
-void Ferma::plateste(int cost) {
-    if (bani < cost) {
-        throw EroareFaliment(std::to_string(cost) + " bani necesari");
-    }
-    bani -= cost;
-}
-
-// cppcheck-suppress unusedFunction
-void Ferma::afisareDetalii() const {
-    std::cout << "=== " << numeF << " ===\nBani: " << bani << "\nAnimale:\n";
-    for (const auto* a : animale) {
-        std::cout << *a << "\n";
+void Ferma::afiseazaAnimale() const {
+    std::cout << "\n--- Animale in " << numeFerma << " ---\n";
+    for (const auto* animal : animale) {
+        std::cout << *animal << "\n"; // Apeleaza operator<< si apoi functia virtuala afisare()
+        animal->scoateSunet();        // Apel de functie virtuala pura
     }
 }
