@@ -9,15 +9,11 @@ int main() {
         // Inițializăm ferma (nume fermă, nume proprietar)
         Ferma ferma("Ferma Vesela", "Flavius");
         ferma.inceputJoc();
-        Magazin magazinComunal;
 
-        Ferma ferma("Ferma Vesela", "Flavius");
-        ferma.inceputJoc();
         ferma.angajeaza("Vasile (Mulgator)", 10);
         // TEST 1: Angajari și Provizii
         ferma.angajeaza("Vasile (Mulgator)", 10);
-        ferma.platesteCheltuieli();
-        ferma.hranesteDinHambar(magazinComunal, "Iarba");
+
         // TEST 2: Simulare scurtă (Biologie + Vanzari)
         // Aici ferma apeleaza intern clasele derivate din Animal
         ferma.proceseazaBiologie();
@@ -25,11 +21,7 @@ int main() {
 
         // Afișăm starea finală
         std::cout << ferma;
-        std::cout << "\n>>> STATISTICI EXTRA <<<\n";
-        std::cout << "Total animale inregistrate: " << Animal::getTotalAnimale() << "\n";
-        std::cout << ferma.getHambar();
-        std::cout << ferma.getPiata() << "\n";
-        std::cout << ferma.getIstoric();
+
         std::cout << "\n--- SIMULARE ÎNCHEIATĂ CU SUCCES ---\n";
 
     } catch (const EroareAplicatie& e) {
