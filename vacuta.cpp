@@ -3,6 +3,10 @@
 Vacuta::Vacuta(std::string n, int v, Sex s)
     : Animal(std::move(n), v, s), nivelFoame(30), nivelEnergie(100), sanatate(StareSanatate::SANATOASA) {}
 
+// cppcheck-suppress unusedFunction
+Animal* Vacuta::clone() const {
+    return new Vacuta(*this);
+}
 Animal* Vacuta::clone() const {
     return new Vacuta(*this);
 }

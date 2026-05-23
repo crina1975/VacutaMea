@@ -9,6 +9,10 @@ Ferma::~Ferma() {
     }
 }
 
+// cppcheck-suppress unusedFunction
+void Ferma::adunaResurse() {
+    int lapteTotal = 0;
+}
 Ferma::Ferma(const Ferma& other) : numeF(other.numeF), bani(other.bani) {
     for (const auto* a : other.animale) {
         animale.push_back(a->clone());
