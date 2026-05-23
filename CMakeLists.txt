@@ -52,8 +52,11 @@ include(cmake/CopyHelper.cmake)
 # Aceasta este linia critică pe care o caută CMake
 add_executable(oop
         main.cpp
-        src/vacuta.cpp
-        src/ferma.cpp
+        vacuta.cpp
+        ferma.cpp
+        animal.cpp
+        gaina.cpp
+        bovina.hpp
 )
 
 

@@ -2,9 +2,11 @@
 #include <random>
 #include <iostream>
 
+// Constructorul apelează constructorul de bază și inițializează atributele specifice
 Vacuta::Vacuta(std::string n, int v, Sex s)
-    : nume{std::move(n)}, varsta{v}, sex{s} {}
+    : Animal(std::move(n), v), sex{s} {}
 
+// Implementări ale metodelor publice (NVI pattern - delegare către metodele virtuale private)
 bool Vacuta::esteAdult() const { return varsta >= 3; }
 Sex Vacuta::getSex() const { return sex; }
 const std::string& Vacuta::getNume() const { return nume; }
@@ -19,6 +21,7 @@ void Vacuta::ramaneInsarcinata() {
     }
 }
 
+// Implementări ale metodelor virtuale private (NVI protected)
 void Vacuta::treceTimpul_(TipVreme vremeCurenta, std::mt19937& generatorRef) {
     int factorFoame = insarcinata ? 40 : 20;
     int factorEnergie = -10;
@@ -31,6 +34,7 @@ void Vacuta::treceTimpul_(TipVreme vremeCurenta, std::mt19937& generatorRef) {
         factorFoame += 10;
     }
 
+    // Probabilitate de îmbolnăvire (10%)
     if (sanatate == StareSanatate::SANATOASA) {
         std::uniform_int_distribution<int> sansaBoala(1, 100);
         if (sansaBoala(generatorRef) <= 10) sanatate = StareSanatate::BOLNAVA;

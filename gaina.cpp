@@ -1,17 +1,18 @@
 #include "gaina.h"
+#include <iostream>
 #include <utility>
 
 Gaina::Gaina(std::string n, int v, int oua_zilnic)
-    : Animal(std::move(n), v), oua(oua_zilnic) {}
+    : Animal(std::move(n), v), ouaZilnic(oua_zilnic) {}
 
 void Gaina::afisare(std::ostream& os) const {
     os << "Gaina ";
-    Animal::afisare(os);
-    os << " -> Ofera: " << oua << " oua/zi";
+    Animal::afisare(os); // Reutilizăm logica din Animal
+    os << " -> Ofera: " << ouaZilnic << " oua/zi";
 }
 
-Animal* Gaina::clone() const {
-    return new Gaina(*this);
+std::unique_ptr<Animal> Gaina::clone() const {
+    return std::make_unique<Gaina>(*this);
 }
 
 void Gaina::scoateSunet() const {
@@ -19,5 +20,5 @@ void Gaina::scoateSunet() const {
 }
 
 int Gaina::adunaOua() const {
-    return oua;
+    return ouaZilnic;
 }

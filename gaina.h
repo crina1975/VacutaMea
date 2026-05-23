@@ -1,18 +1,27 @@
 #pragma once
-#include "animal.h"
+#include "animal.h" // Presupune că Animal este baza
 
 class Gaina : public Animal {
 private:
-    int oua;
+    int ouaZilnic;
 
 protected:
+    // Suprascriem metoda de afișare pentru a include specificul găinii
     void afisare(std::ostream& os) const override;
 
 public:
-    Gaina(std::string n, int v, int oua_zilnic);
+    // Constructor
+    Gaina(std::string n, int v, int oua);
 
-    [[nodiscard]] Animal* clone() const override;
+    // Destructor virtual moștenit
+    ~Gaina() override = default;
+
+    // Metodă pentru clonare polimorfă
+    [[nodiscard]] std::unique_ptr<Animal> clone() const override;
+
+    // Metodă virtuală pură implementată
     void scoateSunet() const override;
 
-    int adunaOua() const;
+    // Metodă specifică
+    [[nodiscard]] int adunaOua() const;
 };

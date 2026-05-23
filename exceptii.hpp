@@ -2,22 +2,29 @@
 #include <stdexcept>
 #include <string>
 
+// Clasa de bază pentru toate excepțiile din ferma ta
 class EroareAplicatie : public std::runtime_error {
 public:
-    using std::runtime_error::runtime_error;
+    using std::runtime_error::runtime_error; // Moștenește constructorii de la std::runtime_error
 };
 
-class EroareFerma : public EroareAplicatie {
+// Excepție pentru parametri invalizi (ex: nume gol, vârstă negativă, buget negativ)
+class EroareParametru : public EroareAplicatie {
 public:
-    using EroareAplicatie::EroareAplicatie;
+    explicit EroareParametru(const std::string& msg)
+        : EroareAplicatie("Eroare parametru: " + msg) {}
 };
 
-class EroareMagazin : public EroareAplicatie {
+// Excepție pentru erori de logică (ex: animal obosit, stoc epuizat)
+class EroareLogica : public EroareAplicatie {
 public:
-    using EroareAplicatie::EroareAplicatie;
+    explicit EroareLogica(const std::string& msg)
+        : EroareAplicatie("Eroare logica: " + msg) {}
 };
 
+// Excepție pentru contracte (ex: contracte invalide)
 class EroareContract : public EroareAplicatie {
 public:
-    using EroareAplicatie::EroareAplicatie;
+    explicit EroareContract(const std::string& msg)
+        : EroareAplicatie("Eroare contract: " + msg) {}
 };
