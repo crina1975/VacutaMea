@@ -5,7 +5,6 @@
 #include <vector>
 #include <iostream>
 #include <random>
-#include <map>
 
 enum class StareCarne { NEFACUTA, PERFECTA, ARSA };
 enum class TipVreme { INSORIT, PLOIOS, FURTUNA, CANICULA };

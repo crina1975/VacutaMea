@@ -11,7 +11,8 @@ std::ostream& operator<<(std::ostream& os, const Istoric& istoric) {
     return os;
 }
 
-Piata::Piata() : generator(std::random_device{}()) {}
+// Folosim un seed fix (12345) pentru a evita memoriile reziduale Valgrind de la /dev/urandom
+Piata::Piata() : generator(12345) {}
 
 // cppcheck-suppress unusedFunction
 void Piata::fluctueazaPreturi() {

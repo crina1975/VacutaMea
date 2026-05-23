@@ -7,6 +7,7 @@ Ferma::~Ferma() {
     for (auto* a : animale) {
         delete a;
     }
+    animale.clear(); // Garantam curatarea pentru Valgrind
 }
 
 Ferma::Ferma(const Ferma& other) : numeF(other.numeF), bani(other.bani) {

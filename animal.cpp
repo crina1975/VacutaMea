@@ -9,6 +9,8 @@ Animal::Animal(std::string n, int v, Sex s)
     }
 }
 
+Animal::~Animal() = default;
+
 void Animal::afisare(std::ostream& os) const {
     os << "[" << idAnimal << "] " << nume << " (V: " << varsta << ")";
 }

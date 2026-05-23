@@ -17,7 +17,7 @@ protected:
 
 public:
     Animal(std::string n, int v, Sex s);
-    virtual ~Animal() = default;
+    virtual ~Animal(); // Definit in .cpp pentru siguranta memoriei
 
     virtual Animal* clone() const = 0;
     virtual void scoateSunet() const = 0;
