@@ -320,8 +320,11 @@ public:
     void hranesteDinHambar(const Magazin& magazin, const std::string& numeProdus);
     void gatesteVitel(size_t index, int secunde);
 
+    // cppcheck-suppress unusedFunction
     [[nodiscard]] const Istoric& getIstoric() const { return jurnal; }
+    // cppcheck-suppress unusedFunction
     [[nodiscard]] const Hambar& getHambar() const { return hambarCentral; }
+    // cppcheck-suppress unusedFunction
     [[nodiscard]] const Piata& getPiata() const { return piataLocala; }
 
     friend std::ostream& operator<<(std::ostream& os, const Ferma& f);

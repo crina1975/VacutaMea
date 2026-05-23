@@ -89,6 +89,7 @@ void Ferma::cheamaVeterinarul() {
     doc.trateazaCireada(cireada, bani, jurnal);
 }
 
+// cppcheck-suppress unusedFunction
 void Ferma::platesteCheltuieli() {
     for (auto& angajat : echipa) {
         angajat.reseteazaZiua();
@@ -195,7 +196,7 @@ void Ferma::proceseazaVanzari() {
     }
     stocLapte = lapteRamas;
 }
-
+// cppcheck-suppress unusedFunction
 void Ferma::hranesteDinHambar(const Magazin& magazin, const std::string& numeProdus) {
     Articol produs = magazin.cautaArticol(numeProdus);
     if (produs.getNume() == "Eroare") return;

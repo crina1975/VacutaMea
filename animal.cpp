@@ -23,6 +23,7 @@ void Animal::afisare(std::ostream& os) const {
 }
 
 // Funcție statică pentru a accesa contorul global
+// cppcheck-suppress unusedFunction
 int Animal::getTotalAnimale() {
     return contor_animale;
 }

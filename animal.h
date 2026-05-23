@@ -39,6 +39,7 @@ public:
     virtual void scoateSunet() const = 0;
 
     // Metode getter simple
+    // cppcheck-suppress unusedFunction
     [[nodiscard]] int getId() const { return id; }
 
     // Funcție statică pentru a accesa contorul
