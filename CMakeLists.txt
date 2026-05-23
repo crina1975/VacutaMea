@@ -50,12 +50,7 @@ include(cmake/CopyHelper.cmake)
 
 # NOTE: update executable name in .github/workflows/cmake.yml:25 when changing name here
 add_executable(NumeleProiectuluiTau
-        main.cpp
-        animal.cpp
-        vacuta.cpp
-        gaina.cpp
-        ferma.cpp
-        utilitare.cpp)
+        main.cpp)
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )
 # NOTE: RUN_SANITIZERS is optional, if it's not present it will default to true

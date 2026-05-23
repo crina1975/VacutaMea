@@ -5,7 +5,7 @@
 #include <utility>
 
 // ==========================================
-// 1. IERARHIE DE EXCEPȚII (Derivate din std::runtime_error)
+// 1. IERARHIE DE EXCEPȚII
 // ==========================================
 class EroareFerma : public std::runtime_error {
 public:
@@ -25,47 +25,30 @@ public:
 };
 
 // ==========================================
-// 2. CLASA DE BAZĂ ABSTRACTĂ (Interfață & Metode Statice)
+// 2. CLASA DE BAZĂ ABSTRACTĂ
 // ==========================================
 class Animal {
 protected:
     std::string nume;
     int varsta;
     int energie;
-
-    // Atribut constant initializat la construire
     const int id;
-
-    // Atribut STATIC (comun pentru toate obiectele)
     static int contor_animale;
 
-    // Functie virtuala protected (Interfata non-virtuala)
     virtual void afisare(std::ostream& os) const {
-        os << "[ID: " << id << "] " << nume << " (Varsta: " << varsta << " ani, Energie: " << energie << "%)";
+        os << "[ID: " << id << "] " << nume << " (V:" << varsta << " ani, E:" << energie << "%)";
     }
 
 public:
     Animal(std::string n, int v) : nume(std::move(n)), varsta(v), energie(100), id(++contor_animale) {
-        // THROW IN CONSTRUCTOR - Validam datele; daca sunt gresite, evitam instantierea obiectului invalid
-        if (nume.empty()) {
-            throw EroareParametru("Numele animalului nu poate fi gol!");
-        }
-        if (varsta < 0) {
-            throw EroareParametru("Varsta nu poate fi negativa!");
-        }
+        if (nume.empty()) throw EroareParametru("Nume gol!");
+        if (varsta < 0) throw EroareParametru("Varsta negativa!");
     }
 
     virtual ~Animal() = default;
-
-    // CONSTRUCTOR VIRTUAL (Clonare)
     virtual Animal* clone() const = 0;
-
-    // Functie virtuala pura
     virtual void scoateSunet() const = 0;
 
-    int getId() const { return id; }
-
-    // Functie STATICĂ
     static int getTotalAnimale() { return contor_animale; }
 
     friend std::ostream& operator<<(std::ostream& os, const Animal& a) {
@@ -74,7 +57,6 @@ public:
     }
 };
 
-// Inițializare atribut static
 int Animal::contor_animale = 0;
 
 // ==========================================
@@ -82,191 +64,125 @@ int Animal::contor_animale = 0;
 // ==========================================
 class Vacuta : public Animal {
 private:
-    int litriLapteZilnic;
+    int litriLapte;
 
 protected:
     void afisare(std::ostream& os) const override {
-        os << "Vacuta ";
-        Animal::afisare(os);
-        os << " -> Ofera: " << litriLapteZilnic << "L lapte/zi";
+        os << "Vacuta "; Animal::afisare(os); os << " -> Lapte: " << litriLapte << "L/zi";
     }
 
 public:
-    Vacuta(std::string n, int v, int lapte) : Animal(std::move(n), v), litriLapteZilnic(lapte) {}
+    Vacuta(std::string n, int v, int lapte) : Animal(std::move(n), v), litriLapte(lapte) {}
 
-    Animal* clone() const override {
-        return new Vacuta(*this);
-    }
-
-    void scoateSunet() const override {
-        std::cout << nume << " mugește: Muuuuu!\n";
-    }
+    Animal* clone() const override { return new Vacuta(*this); }
+    void scoateSunet() const override { std::cout << nume << " face: Muuuuu!\n"; }
 
     int mulge() const {
-        if (energie < 20) throw EroareLogica(nume + " este prea obosita pentru a da lapte.");
-        return litriLapteZilnic;
+        if (energie < 20) throw EroareLogica(nume + " prea obosita.");
+        return litriLapte;
     }
 };
 
 class Gaina : public Animal {
 private:
-    int ouaZilnic;
+    int oua;
 
 protected:
     void afisare(std::ostream& os) const override {
-        os << "Gaina ";
-        Animal::afisare(os);
-        os << " -> Ofera: " << ouaZilnic << " oua/zi";
+        os << "Gaina "; Animal::afisare(os); os << " -> Oua: " << oua << "/zi";
     }
 
 public:
-    Gaina(std::string n, int v, int oua) : Animal(std::move(n), v), ouaZilnic(oua) {}
+    Gaina(std::string n, int v, int oua_zilnic) : Animal(std::move(n), v), oua(oua_zilnic) {}
 
-    Animal* clone() const override {
-        return new Gaina(*this);
-    }
-
-    void scoateSunet() const override {
-        std::cout << nume << " cotcodaceste: Cotcodac!\n";
-    }
-
-    int adunaOua() const {
-        return ouaZilnic;
-    }
+    Animal* clone() const override { return new Gaina(*this); }
+    void scoateSunet() const override { std::cout << nume << " face: Cotcodac!\n"; }
+    int adunaOua() const { return oua; }
 };
 
 // ==========================================
-// 4. GESTIONAREA RESURSELOR (Regula celor 3 - Copy and Swap)
+// 4. MANAGEMENTUL RESURSELOR (Regula celor 3)
 // ==========================================
 class Ferma {
 private:
     std::string numeFerma;
-    std::vector<Animal*> animale; // Gestioneaza pointeri polimorfici
+    std::vector<Animal*> animale;
 
 public:
     explicit Ferma(std::string nume) : numeFerma(std::move(nume)) {
-        if (numeFerma.empty()) throw EroareParametru("Numele fermei nu poate fi gol.");
+        if (numeFerma.empty()) throw EroareParametru("Nume ferma gol.");
     }
 
-    // 1. Constructorul de Copiere (Deep Copy)
     Ferma(const Ferma& other) : numeFerma(other.numeFerma) {
-        std::cout << "[Sistem] Apel Constructor Copiere Ferma\n";
-        for (const auto* animal : other.animale) {
-            animale.push_back(animal->clone());
-        }
+        for (const auto* animal : other.animale) animale.push_back(animal->clone());
     }
 
-    // 2. Destructorul
     ~Ferma() {
-        for (auto* animal : animale) {
-            delete animal;
-        }
+        for (auto* animal : animale) delete animal;
         animale.clear();
     }
 
-    // Functie Custom Swap
-    friend void swap(Ferma& f1, Ferma& f2) noexcept {
-        using std::swap;
-        swap(f1.numeFerma, f2.numeFerma);
-        swap(f1.animale, f2.animale);
-    }
-
-    // 3. Operatorul de Atribuire (Copy-and-Swap idiom)
     Ferma& operator=(Ferma other) {
-        std::cout << "[Sistem] Apel Operator= Ferma\n";
-        swap(*this, other);
+        std::swap(numeFerma, other.numeFerma);
+        std::swap(animale, other.animale);
         return *this;
     }
 
-    // Adaugare polimorfica
     void adaugaAnimal(const Animal& a) {
         animale.push_back(a.clone());
     }
 
-    // DYNAMIC CAST
     void raporteazaProductia() const {
-        int totalLapte = 0;
-        int totalOua = 0;
-
-        std::cout << "\n=== Productie Generata de " << numeFerma << " ===\n";
-
+        int totalLapte = 0, totalOua = 0;
+        std::cout << "\n=== Productie " << numeFerma << " ===\n";
         for (const auto* animal : animale) {
-            // Verificam la runtime ce tip de animal este pointerul curent
-            if (const Vacuta* v = dynamic_cast<const Vacuta*>(animal)) {
-                totalLapte += v->mulge();
-            }
-            else if (const Gaina* g = dynamic_cast<const Gaina*>(animal)) {
-                totalOua += g->adunaOua();
-            }
+            if (const Vacuta* v = dynamic_cast<const Vacuta*>(animal)) totalLapte += v->mulge();
+            else if (const Gaina* g = dynamic_cast<const Gaina*>(animal)) totalOua += g->adunaOua();
         }
-
-        std::cout << " -> Lapte adunat: " << totalLapte << " L\n";
-        std::cout << " -> Oua adunate: " << totalOua << " bucati\n";
+        std::cout << " -> Lapte: " << totalLapte << " L\n -> Oua: " << totalOua << " buc\n";
     }
 
     void catalogAnimale() const {
-        std::cout << "\n=== Catalog Animale (" << numeFerma << ") ===\n";
+        std::cout << "\n=== Catalog (" << numeFerma << ") ===\n";
         for (const auto* animal : animale) {
             std::cout << *animal << "\n";
-            animal->scoateSunet(); // Apel polimorfic
+            animal->scoateSunet();
         }
     }
 };
 
 // ==========================================
-// 5. FUNCTIA MAIN (TESTAREA COMPLETA)
+// 5. FUNCTIA MAIN
 // ==========================================
 int main() {
-    std::cout << "--- START SIMULARE TEMA 2 ---\n\n";
-
-    // TEST 1: Exceptii
     try {
-        std::cout << "[Test] Incercam sa creem un animal cu varsta negativa...\n";
-        Gaina g_invalida("Eroare", -5, 1);
-    }
-    catch (const EroareParametru& e) {
-        std::cout << ">> EROARE PRINSĂ CU SUCCES: " << e.what() << "\n\n";
+        std::cout << "[Test Excepție] Cream animal invalid...\n";
+        Gaina g_eroare("Invalida", -1, 5);
+    } catch (const EroareParametru& e) {
+        std::cout << ">> Prins corect: " << e.what() << "\n\n";
     }
 
     try {
-        Ferma ferma("Ferma Vesela");
-
-        // TEST 2: Polimorfism si Adaugare Animale
-        Vacuta v1("Milka", 4, 15);
-        Gaina g1("Cocuta", 2, 2);
-        Gaina g2("Geta", 1, 1);
+        Ferma ferma("Ferma De Test");
+        Vacuta v1("Milka", 3, 12);
+        Gaina g1("Porumbica", 2, 2);
 
         ferma.adaugaAnimal(v1);
         ferma.adaugaAnimal(g1);
-        ferma.adaugaAnimal(g2);
-
         ferma.catalogAnimale();
-
-        // TEST 3: Dynamic Cast
         ferma.raporteazaProductia();
 
-        // TEST 4: Metode si variabile Statice
-        std::cout << "\n[Statistică] Animale trecute prin sistem pana acum: "
-                  << Animal::getTotalAnimale() << "\n";
+        std::cout << "\n[Statistici] Animale create in memorie: " << Animal::getTotalAnimale() << "\n";
 
-        // TEST 5: Regula celor 3 (Copy & Swap Idiom)
-        std::cout << "\n--- Testare Management Memorie (Deep Copy) ---\n";
-        Ferma fermaCopie = ferma; // Apeleaza Constructorul de Copiere
-
-        Ferma fermaGoala("Ferma Temporara");
-        fermaGoala = ferma;       // Apeleaza Operatorul de Atribuire (Copy-and-Swap)
-
-        std::cout << "Ferma copiata raporteaza aceeasi productie:";
+        Ferma fermaCopie = ferma; // Test copy constructor
+        std::cout << "\n[Test Copiere] Productie din copie:";
         fermaCopie.raporteazaProductia();
 
-    }
-    catch (const EroareFerma& e) {
-        std::cerr << "[EROARE FERMA]: " << e.what() << "\n";
-    }
-    catch (const std::exception& e) {
-        std::cerr << "[EROARE FATALA]: " << e.what() << "\n";
+    } catch (const EroareFerma& e) {
+        std::cerr << "Eroare: " << e.what() << "\n";
+    } catch (const std::exception& e) {
+        std::cerr << "Fatal: " << e.what() << "\n";
     }
 
-    std::cout << "\n--- SFARSIT SIMULARE ---\n";
     return 0;
 }
