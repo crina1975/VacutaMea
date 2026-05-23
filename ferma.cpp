@@ -216,7 +216,7 @@ void Ferma::gatesteVitel(size_t index, int secunde) {
         std::cout << "\n[EROARE] Nu exista nicio vacuta la indexul " << index << "!\n";
         return;
     }
-    auto* v = dynamic_cast<Vacuta*>(cireada[index].get());
+    const auto* v = dynamic_cast<const Vacuta*>(cireada[index].get());
     if (!v) {
         std::cout << "\n[EROARE] Animalul de la index nu poate fi gatit!\n";
         return;

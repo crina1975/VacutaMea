@@ -19,7 +19,7 @@ std::unique_ptr<Animal> Gaina::clone() const {
 void Gaina::scoateSunet() const {
     std::cout << nume << " face: Cotcodac!\n";
 }
-
+// cppcheck-suppress unusedFunction
 int Gaina::adunaOua() const {
     return ouaZilnic;
 }
