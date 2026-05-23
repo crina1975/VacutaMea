@@ -1,51 +1,71 @@
 #include <iostream>
-#include "ferma.h"
-#include "vacuta.h"
-#include "gaina.h"
-#include "exceptii.h"
+#include "ferma.hpp"
 
 int main() {
-    std::cout << "--- RULARE TEMA 2 ---\n\n";
-
-    // TEST 1: Excepții
     try {
-        std::cout << "[Test Excepție] Animal invalid...\n";
-        Gaina g_invalida("", -1, 1);
-    } catch (const EroareFerma& e) {
-        std::cout << ">> Prinsa corect: " << e.what() << "\n\n";
-    }
+        std::cout << "--- START SIMULARE COMPLETA FERMA ---\n";
+        Magazin magazinComunal;
+        std::cout << magazinComunal;
 
-    try {
-        Ferma ferma("Ferma Vesela");
+        std::string np = "Flavius";
+        std::string nf = "Ferma Vesela";
+        Ferma ferma(nf, np);
+        ferma.inceputJoc();
 
-        // TEST 2: Polimorfism si Adaugare
-        Vacuta v1("Milka", 4, 15);
-        Gaina g1("Cocuta", 2, 2);
+        std::cout << "\n>>> TEST 1: Angajari, Cumparaturi si Cladiri <<<\n";
+        ferma.angajeaza("Vasile (Mulgator)", 10);
+        ferma.angajeaza("Ion (Ingrijitor)", 15);
+        ferma.cumparaProvizii(magazinComunal, "Iarba", 30);
+        ferma.cumparaProvizii(magazinComunal, "Fan_Premium", 15);
+        ferma.construiesteAnexa("Sistem Automat Irigatii", 5, 5, 80);
+        ferma.construiesteAnexa("Tractor Nou", 10, 20, 500);
 
-        ferma.adaugaAnimal(v1);
-        ferma.adaugaAnimal(g1);
-        ferma.catalog();
+        std::cout << "\n>>> TEST 2: Contracte Economice <<<\n";
+        ferma.adaugaContract("Lactate SA", 40, 200, 3);
+        ferma.adaugaContract("Mega Image", 100, 600, 10);
 
-        // TEST 3: Dynamic Cast
-        ferma.raporteazaProductia();
+        std::cout << "\n>>> TEST 3: Simulare 7 Zile (Biologie, Vreme, Boli, Vanzari) <<<\n";
+        for(int i = 1; i <= 7; ++i) {
+            std::cout << "\n--- RULARE ZIUA " << i << " ---";
+            ferma.platesteCheltuieli();
+            if (i % 2 == 0) ferma.hranesteDinHambar(magazinComunal, "Fan_Premium");
+            else ferma.hranesteDinHambar(magazinComunal, "Iarba");
 
-        // TEST 4: Atribute Statice
-        std::cout << "\nTotal animale alocate istoric: " << Animal::getTotalAnimale() << "\n";
+            ferma.cheamaVeterinarul();
+            ferma.mulge();
+            ferma.proceseazaVanzari();
+            ferma.proceseazaBiologie();
+        }
 
-        // TEST 5: Regula celor 3 (Deep Copy verificat de Valgrind)
-        std::cout << "\n[Test Copy-And-Swap]\n";
-        Ferma fermaCopie = ferma; // Apeleaza Copy Constructor
+        std::cout << ferma;
 
-        Ferma fermaAlocata("Test");
-        fermaAlocata = ferma;     // Apeleaza Operator=
+        std::cout << "\n>>> TEST 4: Modulul Gratar si Realizari <<<\n";
+        std::cout << "\n > Incerci sa gatesti un taur adult (Va afisa Eroare)...";
+        ferma.gatesteVitel(1, 180);
 
-        std::cout << "Copie: ";
-        fermaCopie.raporteazaProductia();
+        std::cout << "\n > Incerci sa gatesti un vitel inexistent (Va afisa Eroare)...";
+        ferma.gatesteVitel(100, 180);
 
-    } catch (const EroareFerma& e) {
-        std::cerr << "Eroare logica ferma: " << e.what() << "\n";
+        std::cout << "\n > Incerci sa gatesti un vitel mascul PERFECT (180s)...";
+        ferma.gatesteVitel(2, 180);
+
+        std::cout << "\n > Incerci sa gatesti alt vitel mascul ARS (300s)...";
+        ferma.gatesteVitel(3, 300);
+
+        std::cout << "\n\n>>> TEST 5: Regula celor 3 (Academic Requirement) <<<\n";
+        Magazin magazinCopie = magazinComunal;
+        Magazin altMagazin;
+        altMagazin = magazinComunal;
+
+        std::cout << "\n>>> REZUMAT FINAL <<<\n";
+        std::cout << ferma.getHambar();
+        std::cout << ferma.getPiata() << "\n";
+        std::cout << ferma.getIstoric();
+
+    } catch (const EroareAplicatie& e) {
+        std::cout << "[Eroare aplicatie] " << e.what() << "\n";
     } catch (const std::exception& e) {
-        std::cerr << "Eroare generala: " << e.what() << "\n";
+        std::cout << "[Eroare std] " << e.what() << "\n";
     }
 
     return 0;
