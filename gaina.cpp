@@ -2,10 +2,6 @@
 #include <iostream>
 #include <utility>
 
-// cppcheck-suppress unusedFunction
-void Ferma::gatesteVitel(size_t index, int secunde) {
-    if (index >= cireada.size()) {
-        std::cout << "\n[EROARE] Nu exista nicio vacuta la indexul " << index << "!\n";
 
 Gaina::Gaina(std::string n, int v, int oua_zilnic)
     : Animal(std::move(n), v), ouaZilnic(oua_zilnic) {}
