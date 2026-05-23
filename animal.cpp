@@ -19,7 +19,7 @@ Animal::Animal(std::string n, int v)
 // Implementarea funcției de afișare (NVI Pattern - metoda protejată)
 // Aceasta este baza pe care clasele derivate (Vacuta/Gaina) o vor extinde
 void Animal::afisare(std::ostream& os) const {
-    os << "[ID: " << id << "] " << nume << " (Varsta: " << varsta << " ani, Energie: " << energie << "%)";
+    os << "[ID: " << getId() << "] " << nume << " (Varsta: " << varsta << " ani, Energie: " << energie << "%)";
 }
 
 // Funcție statică pentru a accesa contorul global
