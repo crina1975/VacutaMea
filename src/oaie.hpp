@@ -1,9 +1,9 @@
 #pragma once
 #include "animal.hpp"
 
-class Vaca : public Animal {
+class Oaie : public Animal {
 private:
-    int litriLapteZilnic;
+    int lungimeLana;
 
 protected:
     void afisare_(std::ostream& os) const override;
@@ -11,8 +11,9 @@ protected:
     int colecteazaProductie_() override;
 
 public:
-    Vaca(std::string n, int v, int lapte);
+    Oaie(std::string n, int v);
     void hraneste(const Articol& a) override;
     [[nodiscard]] std::unique_ptr<Animal> clone() const override;
     void scoateSunet() const override;
+    int tundeLana();
 };

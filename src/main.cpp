@@ -1,36 +1,47 @@
 #include <iostream>
 #include "ferma.hpp"
+#include "vaca.hpp"
+#include "gaina.hpp"
+#include "oaie.hpp"
+#include "exceptii.hpp"
 
-// Main-ul trebuie să fie foarte simplu pentru a evita erorile de compilare.
 int main() {
     try {
-        std::cout << "--- START SIMULARE TEMA 2 ---\n";
+        std::cout << "--- START SIMULARE ---\n";
+        Ferma ferma("Ferma Valea Verde", 300);
 
-        // Inițializăm ferma (nume fermă, nume proprietar)
-        Ferma ferma("Ferma Vesela", "Flavius");
-        ferma.inceputJoc();
+        ferma.adaugaAnimal(std::make_unique<Vaca>("Milka", 3, 15));
+        ferma.adaugaAnimal(std::make_unique<Vaca>("Joiana", 5, 20));
+        ferma.adaugaAnimal(std::make_unique<Gaina>("Cocuta", 1, 2));
+        ferma.adaugaAnimal(std::make_unique<Oaie>("Miorita", 2));
+        ferma.adaugaAnimal(std::make_unique<Oaie>("Bela", 4));
 
-        ferma.angajeaza("Vasile (Mulgator)", 10);
-        // TEST 1: Angajari și Provizii
-        ferma.angajeaza("Vasile (Mulgator)", 10);
-
-        // TEST 2: Simulare scurtă (Biologie + Vanzari)
-        // Aici ferma apeleaza intern clasele derivate din Animal
-        ferma.proceseazaBiologie();
-        ferma.proceseazaVanzari();
-
-        // Afișăm starea finală
         std::cout << ferma;
 
-        std::cout << "\n--- SIMULARE ÎNCHEIATĂ CU SUCCES ---\n";
+        Articol iarba("Iarba Premium", 25);
+        ferma.hranesteToateAnimalele(iarba);
+
+        ferma.simuleazaZi();
+        ferma.colecteazaTot();
+        ferma.tundeOile();
+
+        ferma.simuleazaZi();
+        ferma.cheamaVeterinar();
+
+        std::cout << ferma;
+
+        std::cout << "\n[Test Copy-And-Swap Idiom]\n";
+        Ferma fermaClonata = ferma;
+        std::cout << fermaClonata;
 
     } catch (const EroareAplicatie& e) {
-        std::cerr << "[Eroare Aplicație]: " << e.what() << "\n";
+        std::cerr << "\n[Eroare Aplicatie]: " << e.what() << "\n";
         return 1;
     } catch (const std::exception& e) {
-        std::cerr << "[Eroare Standard]: " << e.what() << "\n";
+        std::cerr << "\n[Eroare Standard C++]: " << e.what() << "\n";
         return 1;
     }
 
+    std::cout << "\nSimulare incheiata cu succes. Total animale create: " << Animal::getTotalAnimale() << "\n";
     return 0;
 }

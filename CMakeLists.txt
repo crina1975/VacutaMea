@@ -61,6 +61,10 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         include/gaina.hpp
         include/vaca.hpp
         include/exceptii.hpp
+        src/articol.cpp
+        src/articol.cpp
+        src/oaie.hpp
+        src/oaie.cpp
 )
 
 
