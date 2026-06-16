@@ -11,6 +11,7 @@ project(${MAIN_PROJECT_NAME})
 # set(CMAKE_PROJECT_VERSION_MINOR 0)
 # set(CMAKE_PROJECT_VERSION_PATCH 1)
 
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -18,6 +19,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include(cmake/Options.cmake)
 include(cmake/CompilerFlags.cmake)
 include(cmake/CopyHelper.cmake)
+include_directories(include)
 
 ###############################################################################
 
@@ -51,12 +53,18 @@ include(cmake/CopyHelper.cmake)
 # NOTE: update executable name in .github/workflows/cmake.yml:25 when changing name here
 # Aceasta este linia critică pe care o caută CMake
 add_executable(oop
-        main.cpp
-        vacuta.cpp
-        ferma.cpp
-        animal.cpp
-        gaina.cpp
-        bovina.hpp
+        src/main.cpp
+        src/animal.cpp
+        src/ferma.cpp
+        src/gaina.cpp
+        src/vaca.cpp
+        include/oaie.hpp
+        src/oaie.cpp
+        include/utilizare.hpp
+        include/articol.hpp
+        include/animal.h
+        include/gaina.h
+        src/articol.cpp
 )
 
 
