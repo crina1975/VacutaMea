@@ -58,13 +58,9 @@ add_executable(oop
         src/ferma.cpp
         src/gaina.cpp
         src/vaca.cpp
-        include/oaie.hpp
-        src/oaie.cpp
-        include/utilizare.hpp
-        include/articol.hpp
         include/animal.h
         include/gaina.h
-        src/articol.cpp
+        include/vaca.hpp
 )
 
 

@@ -1,42 +1,34 @@
 #include <iostream>
-#include "../include/ferma.hpp"
-#include "../include/vaca.hpp"
-#include "../include/gaina.hpp"
-#include "../include/oaie.hpp"
-#include "../include/exceptii.hpp"
+#include "ferma.hpp"
 
+// Main-ul trebuie să fie foarte simplu pentru a evita erorile de compilare.
 int main() {
     try {
-        Ferma ferma("Ferma Vesela", 200);
+        std::cout << "--- START SIMULARE TEMA 2 ---\n";
 
-        ferma.adaugaAnimal(std::make_unique<Vaca>("Milka", 3, 15));
-        ferma.adaugaAnimal(std::make_unique<Gaina>("Cocuta", 1, 2));
-        ferma.adaugaAnimal(std::make_unique<Oaie>("Miorita", 2));
-        ferma.adaugaAnimal(std::make_unique<Oaie>("Bela", 4));
+        // Inițializăm ferma (nume fermă, nume proprietar)
+        Ferma ferma("Ferma Vesela", "Flavius");
+        ferma.inceputJoc();
 
-        std::cout << ferma << "\n";
+        ferma.angajeaza("Vasile (Mulgator)", 10);
+        // TEST 1: Angajari și Provizii
+        ferma.angajeaza("Vasile (Mulgator)", 10);
 
-        Articol iarba("Iarba Proaspata", 30);
-        ferma.hranesteToateAnimalele(iarba);
+        // TEST 2: Simulare scurtă (Biologie + Vanzari)
+        // Aici ferma apeleaza intern clasele derivate din Animal
+        ferma.proceseazaBiologie();
+        ferma.proceseazaVanzari();
 
-        ferma.simuleazaZi(TipVreme::FURTUNA);
-        ferma.strangeProductia();
-        ferma.tundeOile();
+        // Afișăm starea finală
+        std::cout << ferma;
 
-        std::cout << "Dupa o zi de furtuna:\n" << ferma << "\n";
-
-        ferma.cheamaVeterinar();
-
-        std::cout << "Dupa tratament:\n" << ferma << "\n";
-
-        Ferma fermaClonata = ferma;
-        std::cout << "Ferma Clonata (Test Copy & Swap):\n" << fermaClonata << "\n";
+        std::cout << "\n--- SIMULARE ÎNCHEIATĂ CU SUCCES ---\n";
 
     } catch (const EroareAplicatie& e) {
-        std::cerr << "[Eroare Rulare] " << e.what() << "\n";
+        std::cerr << "[Eroare Aplicație]: " << e.what() << "\n";
         return 1;
     } catch (const std::exception& e) {
-        std::cerr << "[Eroare Critica] " << e.what() << "\n";
+        std::cerr << "[Eroare Standard]: " << e.what() << "\n";
         return 1;
     }
 

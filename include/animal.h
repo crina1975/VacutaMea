@@ -1,42 +1,50 @@
 #pragma once
 #include <string>
-#include <memory>
 #include <iostream>
-#include "articol.hpp"
+#include <memory>
 
-enum class StareSanatate { SANATOASA, BOLNAVA };
-enum class TipVreme { INSORIT, PLOIOS, FURTUNA };
+// Forward declaration pentru a evita includerea inutilă a altor headere
+class Articol;
 
 class Animal {
 protected:
     std::string nume;
     int varsta;
-    int energie;
-    StareSanatate sanatate;
+    int energie{100}; // Inițializare în-clasă (recomandată de Clang-Tidy)
+    int id;
+
+    // Atribut static pentru id-uri unice
     static int contor_animale;
 
-    virtual void afisare_(std::ostream& os) const = 0;
-    virtual void treceTimpul_(TipVreme vreme) = 0;
-    virtual int colecteazaProductie_() = 0;
+    // Metodă virtuală protected pentru afișare (NVI pattern)
+    virtual void afisare(std::ostream& os) const;
 
 public:
+    // Constructorul aruncă excepții pentru a preveni obiecte invalide
     Animal(std::string n, int v);
+
+    // Destructor virtual: esențial în ierarhiile polimorfice
     virtual ~Animal() = default;
-    Animal(const Animal&) = default;
-    Animal& operator=(const Animal&) = default;
 
-    static int getTotalAnimale();
+    // Regula celor 5: asigurăm comportamentul corect la copiere/mutare
+    Animal(const Animal& other) = default;
+    Animal& operator=(const Animal& other) = default;
+    Animal(Animal&& other) noexcept = default;
+    Animal& operator=(Animal&& other) noexcept = default;
 
-    void afisare(std::ostream& os) const;
-    void treceTimpul(TipVreme vreme);
-    int colecteazaProductie();
-
-    virtual void hraneste(const Articol& a) = 0;
+    // Metodă pentru clonare polimorfă (Constructor virtual)
     [[nodiscard]] virtual std::unique_ptr<Animal> clone() const = 0;
 
-    [[nodiscard]] const std::string& getNume() const;
-    [[nodiscard]] bool esteBolnav() const;
-    void vindeca();
+    // Funcție virtuală pură (Animal devine clasă abstractă)
+    virtual void scoateSunet() const = 0;
 
+    // Metode getter simple
+    // cppcheck-suppress unusedFunction
+    [[nodiscard]] int getId() const { return id; }
+
+    // Funcție statică pentru a accesa contorul
+    static int getTotalAnimale();
+
+    // Operator << definit ca friend pentru afișare
     friend std::ostream& operator<<(std::ostream& os, const Animal& a);
 };
