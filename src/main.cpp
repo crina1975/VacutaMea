@@ -4,24 +4,27 @@
 #include "gaina.hpp"
 #include "oaie.hpp"
 #include "exceptii.hpp"
-#include "grafica.hpp" // ADĂUGAT
+#include "grafica.hpp"
+#include "porc.hpp"
 
 int main() {
     try {
-        Grafica::afiseazaLogoFerma(); // ADĂUGAT
-        Grafica::afiseazaTractor();   // ADĂUGAT
+        Grafica::afiseazaLogoFerma();
+        Grafica::afiseazaTractor();
 
         std::cout << "--- START SIMULARE ---\n";
         Ferma ferma("Ferma Valea Verde", 300);
 
         ferma.adaugaAnimal(std::make_unique<Vaca>("Milka", 3, 15));
-        Grafica::afiseazaVaca(); // ADĂUGAT
+        Grafica::afiseazaVaca();
 
         ferma.adaugaAnimal(std::make_unique<Gaina>("Cocuta", 1, 2));
-        Grafica::afiseazaGaina(); // ADĂUGAT
+        Grafica::afiseazaGaina();
+
+        ferma.adaugaAnimal(std::make_unique<Porc>("Ghita", 1));
 
         ferma.adaugaAnimal(std::make_unique<Oaie>("Miorita", 2));
-        Grafica::afiseazaOaie(); // ADĂUGAT
+        Grafica::afiseazaOaie();
 
         std::cout << ferma;
 
@@ -49,7 +52,7 @@ int main() {
         return 1;
     }
 
-    Grafica::afiseazaSfarsit(); // ADĂUGAT
+    Grafica::afiseazaSfarsit();
     std::cout << "Total animale create: " << Animal::getTotalAnimale() << "\n";
     return 0;
 }
