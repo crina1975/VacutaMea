@@ -12,6 +12,6 @@ public:
     static void afiseazaGainaGrafica();
     static void afiseazaOaieGrafica();
     static void afiseazaTractor();
-    static void afiseazaManualJocMasiv(); 
+    static void afiseazaManualJocMasiv();
     static void curataEcranul();
 };
