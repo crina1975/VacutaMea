@@ -3,28 +3,29 @@
 #include "vaca.hpp"
 #include "gaina.hpp"
 #include "oaie.hpp"
+#include "porc.hpp"
 #include "exceptii.hpp"
 #include "grafica.hpp"
-#include "porc.hpp"
 
 int main() {
     try {
-        Grafica::afiseazaLogoFerma();
-        Grafica::afiseazaTractor();
+        InterfataGrafica::afiseazaEcranIncarcare();
+        InterfataGrafica::afiseazaFermaGrafica();
+        InterfataGrafica::afiseazaManualJocMasiv();
 
         std::cout << "--- START SIMULARE ---\n";
         Ferma ferma("Ferma Valea Verde", 300);
 
         ferma.adaugaAnimal(std::make_unique<Vaca>("Milka", 3, 15));
-        Grafica::afiseazaVaca();
+        InterfataGrafica::afiseazaVacaGrafica();
 
         ferma.adaugaAnimal(std::make_unique<Gaina>("Cocuta", 1, 2));
-        Grafica::afiseazaGaina();
-
-        ferma.adaugaAnimal(std::make_unique<Porc>("Ghita", 1));
+        InterfataGrafica::afiseazaGainaGrafica();
 
         ferma.adaugaAnimal(std::make_unique<Oaie>("Miorita", 2));
-        Grafica::afiseazaOaie();
+        InterfataGrafica::afiseazaOaieGrafica();
+
+        ferma.adaugaAnimal(std::make_unique<Porc>("Ghita", 1));
 
         std::cout << ferma;
 
@@ -35,14 +36,12 @@ int main() {
         ferma.colecteazaTot();
         ferma.tundeOile();
 
+        InterfataGrafica::afiseazaTractor();
+
         ferma.simuleazaZi();
         ferma.cheamaVeterinar();
 
         std::cout << ferma;
-
-        std::cout << "\n[Test Copy-And-Swap Idiom]\n";
-        Ferma fermaClonata = ferma;
-        std::cout << fermaClonata;
 
     } catch (const EroareAplicatie& e) {
         std::cerr << "\n[Eroare Aplicatie]: " << e.what() << "\n";
@@ -52,7 +51,6 @@ int main() {
         return 1;
     }
 
-    Grafica::afiseazaSfarsit();
-    std::cout << "Total animale create: " << Animal::getTotalAnimale() << "\n";
+    std::cout << "\nSimulare incheiata cu succes. Total animale create: " << Animal::getTotalAnimale() << "\n";
     return 0;
 }

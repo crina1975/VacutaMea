@@ -1,13 +1,17 @@
 #pragma once
-#include <string>
 #include <iostream>
+#include <string>
+#include <vector>
 
-class Grafica {
+class InterfataGrafica {
 public:
-    static void afiseazaLogoFerma();
-    static void afiseazaVaca();
-    static void afiseazaGaina();
-    static void afiseazaOaie();
+    static void afiseazaEcranIncarcare();
+    static void afiseazaMeniuPrincipal();
+    static void afiseazaFermaGrafica();
+    static void afiseazaVacaGrafica();
+    static void afiseazaGainaGrafica();
+    static void afiseazaOaieGrafica();
     static void afiseazaTractor();
-    static void afiseazaSfarsit();
+    static void afiseazaManualJocMasiv(); 
+    static void curataEcranul();
 };
