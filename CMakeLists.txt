@@ -67,6 +67,8 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         src/oaie.cpp
         include/grafica.hpp
         include/grafica.cpp
+        include/porc.hpp
+        src/porc.cpp
 )
 
 
