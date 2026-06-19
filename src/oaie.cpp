@@ -1,4 +1,4 @@
-#include "oaie.hpp"
+#include "../include/oaie.hpp"
 #include <algorithm>
 
 Oaie::Oaie(std::string n, int v) : Animal(std::move(n), v), lungimeLana(5) {}

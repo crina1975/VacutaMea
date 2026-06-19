@@ -1,15 +1,21 @@
 #include "ferma.hpp"
-#include "oaie.hpp"
+#include "../include/oaie.hpp"
 #include "exceptii.hpp"
+#include "logger.hpp"
 #include <random>
 
 Ferma::Ferma(std::string nume, int bugetInitial) : numeFerma(std::move(nume)), buget(bugetInitial), stocProduse(0), ziuaCurenta(1) {
     if (buget < 0) throw EroareParametru("Bugetul initial nu poate fi negativ.");
+    istoricBuget.adauga(buget);
+    istoricStoc.adauga(stocProduse);
+    Logger::getInstanta().log("Ferma " + numeFerma + " a fost infiintata cu buget: " + std::to_string(buget));
 }
 
 Ferma::Ferma(const Ferma& other) : numeFerma(other.numeFerma), buget(other.buget), stocProduse(other.stocProduse), ziuaCurenta(other.ziuaCurenta) {
     animale.reserve(other.animale.size());
-    for (const auto& a : other.animale) animale.push_back(a->clone());
+    for (const auto& a : other.animale) {
+        animale.push_back(a->clone());
+    }
 }
 
 void swap(Ferma& first, Ferma& second) noexcept {
@@ -28,6 +34,7 @@ Ferma& Ferma::operator=(Ferma other) {
 
 void Ferma::adaugaAnimal(std::unique_ptr<Animal> animal) {
     if (!animal) throw EroareParametru("Pointerul animal este null.");
+    Logger::getInstanta().log("A fost adaugat animalul: " + animal->getNume());
     animale.push_back(std::move(animal));
 }
 
@@ -38,9 +45,14 @@ void Ferma::simuleazaZi() {
     auto vremeAzi = static_cast<TipVreme>(dist(gen));
 
     std::cout << "\n--- Incepe ziua " << ziuaCurenta << " (Vreme ID: " << static_cast<int>(vremeAzi) << ") ---\n";
+    Logger::getInstanta().log("A inceput ziua " + std::to_string(ziuaCurenta));
+
     for (auto& animal : animale) {
         animal->treceTimpul(vremeAzi);
     }
+
+    istoricBuget.adauga(buget);
+    istoricStoc.adauga(stocProduse);
 }
 
 void Ferma::hranesteToateAnimalele(const Articol& hrana) {
@@ -80,11 +92,17 @@ void Ferma::cheamaVeterinar() {
                 buget -= costTratament;
                 animal->vindeca();
                 std::cout << "[INFO] Veterinarul a vindecat pe " << animal->getNume() << ".\n";
+                Logger::getInstanta().log("Veterinarul l-a tratat pe " + animal->getNume());
             } else {
                 throw EroareResurse("Fonduri insuficiente pentru a trata pe " + animal->getNume());
             }
         }
     }
+}
+
+void Ferma::afiseazaRegistre() const {
+    istoricBuget.afiseaza(std::cout, "Evolutie Buget");
+    istoricStoc.afiseaza(std::cout, "Evolutie Stoc Produse");
 }
 
 std::ostream& operator<<(std::ostream& os, const Ferma& f) {

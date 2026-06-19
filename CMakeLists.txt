@@ -63,12 +63,17 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         include/exceptii.hpp
         src/articol.cpp
         src/articol.cpp
-        src/oaie.hpp
+        include/oaie.hpp
         src/oaie.cpp
         include/grafica.hpp
         src/grafica.cpp
         include/porc.hpp
         src/porc.cpp
+        include/logger.hpp
+        src/logger.cpp
+        include/animal_factory.hpp
+        src/animal_factory.cpp
+        include/registru.hpp
 )
 
 

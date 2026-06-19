@@ -1,6 +1,4 @@
 #include "grafica.hpp"
-#include <vector>
-
 // cppcheck-suppress unusedFunction
 void InterfataGrafica::curataEcranul() {
     for(int i = 0; i < 40; ++i) std::cout << "\n";
@@ -8,70 +6,65 @@ void InterfataGrafica::curataEcranul() {
 // cppcheck-suppress unusedFunction
 void InterfataGrafica::afiseazaEcranIncarcare() {
     std::string logo = R"(
-    ███████╗███████╗██████╗ ███╗   ███╗ █████╗     ██╗   ██╗███████╗███████╗███████╗██╗      █████╗
-    ██╔════╝██╔════╝██╔══██╗████╗ ████║██╔══██╗    ██║   ██║██╔════╝██╔════╝██╔════╝██║     ██╔══██╗
-    █████╗  █████╗  ██████╔╝██╔████╔██║███████║    ██║   ██║█████╗  ███████╗█████╗  ██║     ███████║
-    ██╔══╝  ██╔══╝  ██╔══██╗██║╚██╔╝██║██╔══██║    ╚██╗ ██╔╝██╔══╝  ╚════██║██╔══╝  ██║     ██╔══██║
-    ██║     ███████╗██║  ██║██║ ╚═╝ ██║██║  ██║     ╚████╔╝ ███████╗███████║███████╗███████╗██║  ██║
+    ███████╗███████╗██████╗███╗   ███╗█████╗     ██╗  ██╗███████╗███████╗███████╗██╗     █████╗
+    ██╔════╝██╔════╝██╔══██╗████╗████║██╔══██╗   ██║  ██║██╔════╝██╔════╝██╔════╝██║    ██╔══██╗
+    █████╗  █████╗  ██████╔╝██╔████╔██║███████║   ██║  ██║█████╗  ███████╗█████╗  ██║    ███████║
+    ██╔══╝  ██╔══╝  ██╔══██╗██║╚██╔╝██║██╔══██║   ╚██╗██╔╝██╔══╝  ╚════██║██╔══╝  ██║    ██╔══██║
+    ██║     ███████╗██║  ██║██║╚═╝ ██║██║  ██║     ╚████╔╝███████╗███████║███████╗███████╗██║  ██║
     ╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝      ╚═══╝  ╚══════╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝
     )";
     std::cout << logo << "\n";
 }
 // cppcheck-suppress unusedFunction
 void InterfataGrafica::afiseazaFermaGrafica() {
-    std::cout << "\n       _.-^-._    .--.\n    .-'   _   '-. |__|\n   /     |_|     \\ |  |\n";
+    std::cout << R"(
+         _.-^-._    .--.
+      .-'   _   '-. |__|
+     /     |_|     \ | |
+    )" << "\n";
 }
 // cppcheck-suppress unusedFunction
-void InterfataGrafica::afiseazaVacaGrafica() { std::cout << "    ^__^\n    (oo)\\_______\n    (__)\\       )\\/\\\n        ||----w |\n        ||     ||\n"; }
+void InterfataGrafica::afiseazaVacaGrafica() { 
+    std::cout << R"(
+          (__)
+          (oo)
+    /------\/
+   / |    ||
+  * /\---/\
+     ~~   ~~
+    )" << "\n"; 
+}
 // cppcheck-suppress unusedFunction
-void InterfataGrafica::afiseazaGainaGrafica() { std::cout << "      //\n     ('>\n     /rr\\\n    *\\/\\/*\n"; }
+void InterfataGrafica::afiseazaGainaGrafica() { 
+    std::cout << R"(
+          //
+        ('>
+        /rr\
+       *\/\/*
+    )" << "\n"; 
+}
 // cppcheck-suppress unusedFunction
-void InterfataGrafica::afiseazaOaieGrafica() { std::cout << "      __\n     /  \\\n    | oo |\n  /======\\\n / |    | \\\n* ||--||  *\n"; }
+void InterfataGrafica::afiseazaOaieGrafica() { 
+    std::cout << R"(
+          __
+        /    \
+        | oo |
+      /======\
+      / |    | \
+     * ||--||  *
+    )" << "\n"; 
+}
 // cppcheck-suppress unusedFunction
-void InterfataGrafica::afiseazaTractor() { std::cout << "    _|_|_\n   /     \\\n  |       |___\n /___________\\\n  (O)     (O)\n"; }
+void InterfataGrafica::afiseazaTractor() { 
+    std::cout << R"(
+        _|_|_
+      /     \
+      |      |___
+     /___________\
+      (O)     (O)
+    )" << "\n"; 
+}
 // cppcheck-suppress unusedFunction
 void InterfataGrafica::afiseazaManualJocMasiv() {
-
-    std::vector<std::string> bazaDeDateFerma = {
-        R"(CAPITOLUL 1: REGULAMENTUL INTERN AL FERMEI. Orice animal introdus in ferma trebuie sa treaca printr-un proces riguros de validare a parametrilor. Varsta nu poate fi negativa, iar nivelul de energie este initializat standard la 100%. Productia depinde 100% de vreme si de stocul de hrana. Acesta este un sistem bazat pe POO pur. Folosim incapsulare maxima pentru a proteja starea interna a obiectelor derivate.)",
-        R"(CAPITOLUL 2: GENETICA BOVINELOR. Vacile din aceasta simulare sunt derivate din clasa Animal si poseda o mostenire genetica complexa. Laptele produs este calculat in functie de satietate. Vremea caniculara scade energia vacii cu 35%, o penalizare grava ce necesita hranire imediata. Daca energia scade sub 20%, vaca se imbolnaveste. Veterinarul costa bani reali din bugetul fermei, care incepe de la 300 unitati.)",
-        R"(CAPITOLUL 3: MANAGEMENTUL GAINILOR. Gainile sunt creaturi fragile in ecosistemul nostru. In caz de furtuna, o gaina poate claca instantaneu. Consumul lor de energie este mic pe vreme buna, dar e imperativ sa le hranim cu furaje concentrate (putere satietate 2x). Returneaza oua, care reprezinta profitul secundar al fermierului.)",
-        R"(CAPITOLUL 4: OI SI LANA. Oile (Ovis aries) sunt animale de turma ce produc lana (cresterea acesteia depinde de zilele insorite). Metoda tundeLana() va reseta lungimea lanii inapoi la valoarea de baza. Doar prin verificari RTTI (dynamic_cast) aplicate pe std::unique_ptr<Animal> putem identifica oile din vectorul comun si le putem procesa distinct.)",
-
-        // ====================================================================================
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)"
-           R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)"
-           R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)",
-        R"(LOREM IPSUM FERMA LORE: Ferma a fost construita pe niste dealuri inalte pentru a asigura o protectie optima impotriva furtunilor, dar acest lucru a ingreunat accesul tractorului (instantiat doar grafic). Veterinarul vine de la oras si percepe o taxa fixa, aruncand EroareResurse in caz de faliment. Sistemul de memorie este garantat fara scurgeri (Memory Leak free) prin utilizarea exclusiva a pointerilor inteligenti de tip std::unique_ptr si a idiom-ului Copy-And-Swap. Constructorii virtuali (functia clone) asigura duplicarea polimorfica perfecta a turmei. RTTI-ul asigura recunoasterea tipurilor in runtime.)"
-        // ====================================================================================
-    };
-
-    std::cout << "\n[INFO] Manualul si regulamentul fermei au fost incarcate. Memorie consumata de date: "
-              << bazaDeDateFerma.size() * 400 << " bytes.\n";
+    std::cout << "\n[INFO] Manualul si regulamentul fermei au fost incarcate.\n";
 }
